@@ -1,0 +1,61 @@
+{
+  "cSpell.language": "en-AU",
+  "explorer.compactFolders": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    ".env": "*.env, .env.*",
+    "package.json": "pnpm-lock.yaml, pnpm-workspace.yaml",
+    "*.js": "$(capture).js.map, $(capture).d.ts",
+    "*.jsx": "$(capture).jsx.map, $(capture).d.ts",
+    "*.d.ts": "$(capture).d.ts.map"
+  },
+  "[typescript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[typescriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[json]": { "editor.defaultFormatter": "biomejs.biome" },
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "cSpell.words": ["playtimes"],
+  "todo-tree.general.tags": ["=====", "NOTE", "IDEA", "TODO", "FIX", "HACK"],
+  "todo-tree.highlights.customHighlight": {
+    "=====": {
+      "type": "whole-line",
+      "icon": "bookmark",
+      "foreground": "#dadada",
+      "gutterIcon": true,
+      "hideFromTree": true
+    },
+    "NOTE": {
+      "type": "whole-line",
+      "icon": "note",
+      "foreground": "#8df7ff",
+      "gutterIcon": true,
+      "hideFromTree": true
+    },
+    "IDEA": {
+      "type": "whole-line",
+      "icon": "light-bulb",
+      "foreground": "#458efc",
+      "gutterIcon": true
+    },
+    "TODO": {
+      "type": "whole-line",
+      "icon": "check",
+      "foreground": "#ff9900",
+      "gutterIcon": true
+    },
+    "FIX": {
+      "type": "whole-line",
+      "icon": "bug",
+      "foreground": "#e63d00",
+      "gutterIcon": true
+    },
+    "HACK": {
+      "type": "whole-line",
+      "icon": "tools",
+      "foreground": "#45da20",
+      "gutterIcon": true
+    }
+  }
+}
