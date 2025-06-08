@@ -11,7 +11,8 @@ def OnAppStart(app_name: str, instance_id: str):
 def OnAppPing(instance_id: str):
   playtime.ping_session(instance_id)
 
-def OnAppStop(instance_id: str):
+def OnAppStop(app_name: str, instance_id: str):
+  print(f"Non-stop app {app_name} stopped, tracking playtime...")
   playtime.stop_session(instance_id)
 
 def GetPlaytime(app_name: str):
@@ -22,13 +23,13 @@ def GetPlaytime(app_name: str):
 
 class Plugin:
   def _front_end_loaded(self):
-    print("Frontend has loaded")
+    print("Frontend has loaded, now ready to track playtime...")
     pass
   
   def _load(self):
     playtime.load_sessions()
     Millennium.ready()
-    print("Ready to track playtimes")
+    print("Backend loaded, waiting for frontend...")
     pass
 
   def _unload(self):

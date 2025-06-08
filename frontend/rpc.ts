@@ -20,7 +20,7 @@ export async function getPlaytime(app: Steam.AppOverview) {
 export async function onAppStart(app: Steam.AppOverview, instanceId: string) {
   if (app.size_on_disk !== '0') return;
   logger.info(
-    `Non-steam app ${app.display_name} launched, tracking playtime...`,
+    `Non-steam app ${app.display_name} launched, starting session...`,
   );
   return void call('OnAppStart', {
     app_name: app.display_name,
@@ -35,5 +35,9 @@ export function onAppPing(app: Steam.AppOverview, instanceId: string) {
 
 export async function onAppStop(app: Steam.AppOverview, instanceId: string) {
   if (app.size_on_disk !== '0') return;
-  return void call('OnAppStop', { instance_id: instanceId });
+  logger.info(`Non-steam app ${app.display_name} stopped, ending session...`);
+  return void call('OnAppStop', {
+    app_name: app.display_name,
+    instance_id: instanceId,
+  });
 }

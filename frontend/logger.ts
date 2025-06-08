@@ -10,7 +10,7 @@ class Logger {
   #infoStyle = 'background: rgb(28, 135, 206); color: white;';
   info(...args: unknown[]) {
     console.info(
-      `%c ${this.#module} %c ${this.#organisation} %c`,
+      `%c ${this.#organisation} %c ${this.#module} %c`,
       this.#style,
       this.#infoStyle,
       'background: transparent;',
@@ -20,13 +20,19 @@ class Logger {
 
   #warnStyle = 'background: #ffbb00; color: white;';
   warn(...args: unknown[]) {
-    console.warn(this.#style, this.#warnStyle, 'color: blue;', ...args);
+    console.warn(
+      `%c ${this.#organisation} %c ${this.#module} %c`,
+      this.#style,
+      this.#warnStyle,
+      'color: blue;',
+      ...args,
+    );
   }
 
   #errorStyle = 'background: #FF0000;';
   error(...args: unknown[]) {
     console.error(
-      `%c ${this.#module} %c ${this.#organisation} %c`,
+      `%c ${this.#organisation} %c ${this.#module} %c`,
       this.#style,
       this.#errorStyle,
       'background: transparent;',
