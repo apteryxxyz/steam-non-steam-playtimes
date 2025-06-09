@@ -30,7 +30,10 @@ export async function onAppStart(app: Steam.AppOverview, instanceId: string) {
 
 export function onAppPing(app: Steam.AppOverview, instanceId: string) {
   if (app.size_on_disk !== '0') return;
-  return void call('OnAppPing', { instance_id: instanceId });
+  return void call('OnAppPing', {
+    app_name: app.display_name,
+    instance_id: instanceId,
+  });
 }
 
 export async function onAppStop(app: Steam.AppOverview, instanceId: string) {

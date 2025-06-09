@@ -1,25 +1,26 @@
 import Millennium # type: ignore
-import playtime
+import playtime_sessions as playtime
 import json
+import helpers
 
-#
+# ===== RPC ===== #
 
 def OnAppStart(app_name: str, instance_id: str):
   playtime.start_session(app_name, instance_id)
-  print(f"Non-start app {app_name} launched, tracking playtime...")
+  print(f"Non-steam app {app_name} launched, starting session...")
 
-def OnAppPing(instance_id: str):
-  playtime.ping_session(instance_id)
+def OnAppPing(app_name: str, instance_id: str):
+  playtime.ping_session(app_name, instance_id)
 
 def OnAppStop(app_name: str, instance_id: str):
-  print(f"Non-stop app {app_name} stopped, tracking playtime...")
-  playtime.stop_session(instance_id)
+  print(f"Non-steam app {app_name} stopped, ending session...")
+  playtime.stop_session(app_name, instance_id)
 
 def GetPlaytime(app_name: str):
   timings = playtime.get_playtime(app_name)
-  return json.dumps(timings, default=str)
+  return json.dumps(timings, default=helpers.json_dumps_stringify)
 
-#
+# ===== Plugin ===== #
 
 class Plugin:
   def _front_end_loaded(self):
