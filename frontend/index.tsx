@@ -1,6 +1,7 @@
-import OnLibraryAppLoaded from './library-app/index.js';
+import OnLibraryAppLoaded from './library-app/index.jsx';
+import { monitorActiveLocation } from './monitor/active-location.js';
+import { monitorRunningApps } from './monitor/running-apps.js';
 import logger from './logger.js';
-import { monitorActiveLocation, monitorRunningApps } from './monitor.js';
 import { onAppPing, onAppStart, onAppStop } from './rpc.js';
 import Steam from './steam.js';
 
