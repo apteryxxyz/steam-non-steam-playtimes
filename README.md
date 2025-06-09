@@ -22,7 +22,7 @@ A Millennium plugin that tracks playtime for non-Steam games.
 
 ### Data Location
 
-Session data is stored in `~/Documents/Apteryx/Non-Steam/sessions.json`. If you ever want to say reinstall your OS and want to keep your non-Steam playtimes, **backup this file** and restore it on the new PC to get your playtimes back.
+Session data is stored in `<STEAM>/plugins/non-steam-playtimes/sessions.json`. If you ever want to say reinstall your OS and want to keep your non-Steam playtimes, **backup this file** and restore it on the new PC to get your playtimes back.
 
 ### Epic Games Launch Fix
 

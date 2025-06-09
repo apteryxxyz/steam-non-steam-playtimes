@@ -3,10 +3,11 @@ from typing import TypedDict, NotRequired
 from pathlib import Path
 import helpers
 import json
+from __main__ import PLUGIN_BASE_DIR
 
 #
 
-SESSIONS_PATH = Path.home() / "Documents" / "Apteryx" / "Non-Steam" / "sessions.json"
+SESSIONS_PATH = Path(PLUGIN_BASE_DIR) / "sessions.json"
 
 # We use app name as index due to app id for non-steam games being arbitrary
 class Session(TypedDict):
