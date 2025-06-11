@@ -15,22 +15,28 @@ export default async function OnLibraryAppLoaded(
 }
 
 async function patchPlayBar(window: Window, app: Steam.AppOverview) {
-  const playtime = await getPlaytime(app);
+  const { lastPlayedAt, forever } = await getPlaytime(app);
 
-  const children = [
-    playtime.lastPlayedAt ? (
-      <LastPlayed key={app.display_name} lastPlayedAt={playtime.lastPlayedAt} />
-    ) : null,
-    playtime.forever ? (
-      <Playtime key={app.display_name} playtime={playtime.forever} />
-    ) : null,
-  ].map(renderComponent);
-
-  if (!children.filter(Boolean).length) return;
-
-  for (const parent of await querySelectorAll(
+  const parents = await querySelectorAll(
     window.document,
     `.${PlayBarClasses.GameStatsSection}`,
-  ))
-    parent.append(...children);
+  );
+
+  for (const parent of parents) {
+    if (forever) {
+      parent.querySelector('[data-nsp-playtime]')?.remove();
+      const component = <Playtime playtime={forever} />;
+      const element = renderComponent(component);
+      element.setAttribute('data-nsp-playtime', 'true');
+      parent.append(element);
+    }
+
+    if (lastPlayedAt) {
+      parent.querySelector('[data-nsp-last-played]')?.remove();
+      const component = <LastPlayed lastPlayedAt={lastPlayedAt} />;
+      const element = renderComponent(component);
+      element.setAttribute('data-nsp-last-played', 'true');
+      parent.append(element);
+    }
+  }
 }
