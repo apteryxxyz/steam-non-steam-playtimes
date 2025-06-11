@@ -23,12 +23,24 @@ function Create-Plugin-Symlink {
   $targetPath = "$STEAM\plugins\$pluginName"
   $sourcePath = Get-Location
 
-  if (!(Test-Path $targetPath)) {
-    Write-Output "Creating symlink to plugins directory..."
+  if (Test-Path $targetPath) {
+    Write-Output "Plugin symlink already exists, skipping..."
+    return
+  }
+
+  Write-Output "Creating symlink to plugins directory..."
+
+  $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
+  ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+  if ($isAdmin) {
     New-Item -Path $targetPath -ItemType SymbolicLink -Value $sourcePath | Out-Null
   }
   else {
-    Write-Output "Plugin symlink already exists, skipping..."
+    $targetPath = $targetPath.Replace('`', '``').Replace('"', '""')
+    $sourcePath = $sourcePath.ToString().Replace('`', "``").Replace('"', '""')
+    $commandToRun = "New-Item -Path '$targetPath' -ItemType SymbolicLink -Value '$sourcePath' | Out-Null"
+    Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-Command", $commandToRun -Verb RunAs
   }
 }
 
