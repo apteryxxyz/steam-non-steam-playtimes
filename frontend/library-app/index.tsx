@@ -23,19 +23,19 @@ async function patchPlayBar(window: Window, app: Steam.AppOverview) {
   );
 
   for (const parent of parents) {
-    if (forever) {
-      parent.querySelector('[data-nsp-playtime]')?.remove();
-      const component = <Playtime playtime={forever} />;
-      const element = renderComponent(component);
-      element.setAttribute('data-nsp-playtime', 'true');
-      parent.append(element);
-    }
-
     if (lastPlayedAt) {
       parent.querySelector('[data-nsp-last-played]')?.remove();
       const component = <LastPlayed lastPlayedAt={lastPlayedAt} />;
       const element = renderComponent(component);
       element.setAttribute('data-nsp-last-played', 'true');
+      parent.append(element);
+    }
+
+    if (forever) {
+      parent.querySelector('[data-nsp-playtime]')?.remove();
+      const component = <Playtime playtime={forever} />;
+      const element = renderComponent(component);
+      element.setAttribute('data-nsp-playtime', 'true');
       parent.append(element);
     }
   }
