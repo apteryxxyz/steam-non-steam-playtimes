@@ -1,10 +1,10 @@
 from datetime import datetime
 
-def json_dumps_stringify(value):
+def json_replacer(value):
   if isinstance(value, datetime):
     return value.isoformat()
 
-def json_loads_parse(object):
+def json_reviver(object):
   for key, value in object.items():
     try:
       object[key] = datetime.fromisoformat(str(value))

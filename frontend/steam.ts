@@ -10,14 +10,8 @@ namespace Steam {
   // ===== PopupManager ===== //
 
   export interface PopupManager {
-    GetExistingPopup(name: string): PopupContext;
-    AddPopupCreatedCallback(callback: (context: PopupContext) => void): void;
-  }
-
-  export interface PopupContext {
-    m_strName: string;
-    m_popup: Window;
-    m_element: Element;
+    GetExistingPopup(name: string): Popup;
+    AddPopupCreatedCallback(callback: (popup: Popup) => void): void;
   }
 
   export const PopupManager: PopupManager = Reflect.get(
@@ -25,12 +19,28 @@ namespace Steam {
     'g_PopupManager',
   );
 
-  // ===== MainWindowBrowser ===== //
-
   export const MainWindowName = 'SP Desktop_uid0';
 
+  export interface Popup {
+    get title(): string;
+    set title(title: string);
+    get window(): Window | undefined;
+    get root_element(): Element;
+  }
+
+  // ===== MainWindowBrowser ===== //
+
+  export interface MainWindowBrowserManager {
+    m_browser: MainWindowBrowser;
+    m_lastActiveTab: 'store' | 'library' | 'community' | (string & {});
+    m_lastLocation: MainWindowBrowserLocation;
+    m_history: MainWindowBrowserHistory;
+  }
+
   export interface MainWindowBrowserLocation
-    extends Pick<URL, 'pathname' | 'search' | 'hash'> {}
+    extends Pick<URL, 'pathname' | 'search' | 'hash'> {
+    key: string;
+  }
 
   export interface MainWindowBrowser {
     on(
@@ -43,18 +53,24 @@ namespace Steam {
     listen(callback: (location: MainWindowBrowserLocation) => void): void;
   }
 
-  export interface MainWindowBrowserManager {
-    m_browser: MainWindowBrowser;
-    m_history: MainWindowBrowserHistory;
-    m_lastLocation: MainWindowBrowserLocation;
-  }
-
   export const MainWindowBrowserManager: MainWindowBrowserManager = undefined!;
   Object.defineProperty(Steam, 'MainWindowBrowserManager', {
     get: () => Reflect.get(globalThis, 'MainWindowBrowserManager'),
     enumerable: true,
     configurable: true,
   });
+
+  // ===== LocalizationManager ===== //
+
+  export interface LocalizationManager {
+    m_mapTokens: Map<string, string>;
+    LocalizeString(token: `#${string}`): string;
+  }
+
+  export const LocalizationManager: LocalizationManager = Reflect.get(
+    globalThis,
+    'LocalizationManager',
+  );
 
   // ===== AppOverview ===== //
 
@@ -91,6 +107,16 @@ namespace Steam {
   }
 
   export const AppStore: AppStore = Reflect.get(globalThis, 'appStore');
-}
 
+  // ===== CollectionStore ===== //
+
+  export interface CollectionStore {
+    OnAppOverviewChange(apps: AppOverview[]): void;
+  }
+
+  export const CollectionStore: CollectionStore = Reflect.get(
+    globalThis,
+    'collectionStore',
+  );
+}
 export default Steam;

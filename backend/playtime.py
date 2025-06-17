@@ -1,8 +1,9 @@
-from datetime import datetime, timezone, timedelta
-from typing import TypedDict, NotRequired
 from pathlib import Path
-import helpers
+from datetime import datetime, timezone, timedelta
 import json
+from typing import TypedDict, NotRequired
+
+from helpers import json_replacer, json_reviver
 from __main__ import PLUGIN_BASE_DIR
 
 #
@@ -21,14 +22,14 @@ def load_sessions():
   global _sessions
   if SESSIONS_PATH.exists():
     with open(SESSIONS_PATH, "r") as f:
-      _sessions = json.load(f, object_hook=helpers.json_loads_parse)
+      _sessions = json.load(f, object_hook=json_reviver)
 
 def save_sessions():
   # This could eventually become out of hand if there are a lot of sessions
   # Perhaps sessions should be collapsed when they are over two weeks old (the reason sessions even exist)
   SESSIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
   with open(SESSIONS_PATH, "w") as f:
-    json.dump(_sessions, f, indent=2, default=helpers.json_dumps_stringify)
+    json.dump(_sessions, f, indent=2, default=json_replacer)
 
 #
 
@@ -43,24 +44,25 @@ def start_session(app_name: str, instance_id: str):
 
 def ping_session(app_name: str, instance_id: str):
   for session in _sessions[app_name]:
-    if "instance_id" in session and session["instance_id"] == instance_id:
+    if session.get("instance_id", None) == instance_id:
       session["ended_at"] = datetime.now(timezone.utc)
       save_sessions()
       break
 
 def stop_session(app_name: str, instance_id: str):
   for session in _sessions[app_name]:
-    if "instance_id" in session and session["instance_id"] == instance_id:
+    if session.get("instance_id", None) == instance_id:
       session["ended_at"] = datetime.now(timezone.utc)
       del session["instance_id"]
       save_sessions()
       break
 
 def get_playtime(app_name: str):
-  forever = 0
-  last_two_weeks = 0
+  TWO_WEEKS_AGO = datetime.now(timezone.utc) - timedelta(days=14)
+
+  minutes_forever = 0
+  minutes_last_two_weeks = 0
   last_played_at = None
-  two_weeks_ago = datetime.now(timezone.utc) - timedelta(days=14)
 
   for session in _sessions[app_name] if app_name in _sessions else []:
 
@@ -69,17 +71,16 @@ def get_playtime(app_name: str):
     ended_at = session["ended_at"]
     minutes = (ended_at - started_at).total_seconds() / 60
 
-    # If within last two weeks, add to last_two_weeks
-    if started_at > two_weeks_ago:
-      last_two_weeks += minutes
-    forever += minutes
+    if started_at > TWO_WEEKS_AGO:
+      minutes_last_two_weeks += minutes
+    minutes_forever += minutes
 
     # Update last_played_at if necessary
     if last_played_at is None or ended_at > last_played_at:
       last_played_at = ended_at
 
   return {
+    "minutes_forever": minutes_forever,
+    "minutes_last_two_weeks": minutes_last_two_weeks,
     "last_played_at": last_played_at,
-    "last_two_weeks": last_two_weeks,
-    "forever": forever,
   }

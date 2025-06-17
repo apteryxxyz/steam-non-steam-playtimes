@@ -2,6 +2,7 @@ class Logger {
   #style = 'background: rgb(43, 89, 216); color: white;';
   #module: string;
   #organisation: string;
+
   constructor(module: string, organisation: string) {
     this.#module = module;
     this.#organisation = organisation;

@@ -19,9 +19,31 @@ export async function waitFor<T>(
 }
 
 export function querySelectorAll(document: Document, selectors: string) {
-  return Millennium.findElement(document, String(selectors));
+  return Millennium.findElement(document, String(selectors), 5000);
 }
 
-export function querySelector(document: Document, selector: string) {
-  return Millennium.findElement(document, selector).then((e) => e[0]);
+export function jsonReplacer(_key: string, value: unknown) {
+  if (value instanceof Date) return value.toISOString();
+  return value;
 }
+
+export function jsonReviver(_key: string, value: unknown) {
+  if (typeof value === 'string') {
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+  return value;
+}
+
+export type Tuple<Holds, Length extends number> = Length extends Length
+  ? number extends Length
+    ? Holds[]
+    : _TupleOf<Holds, Length, []>
+  : never;
+type _TupleOf<
+  Holds,
+  Length extends number,
+  Rest extends unknown[],
+> = Rest['length'] extends Length
+  ? Rest
+  : _TupleOf<Holds, Length, [Holds, ...Rest]>;
