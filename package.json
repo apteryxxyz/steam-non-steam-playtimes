@@ -3,6 +3,7 @@
   "packageManager": "pnpm@10.10.0",
   "private": true,
   "scripts": {
+    "format": "biome format . --write",
     "build": "millennium-ttc --build prod",
     "dev": "powershell -ExecutionPolicy Bypass -File dev.ps1"
   },

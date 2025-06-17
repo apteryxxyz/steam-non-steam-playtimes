@@ -14,6 +14,7 @@ export async function monitorRunningApps({
   const instanceIds = new Map<string, string>();
 
   while (!signal?.aborted) {
+    // There's probably a proper way of registering a listener for this, but this is easier for now
     const currentApps = new Set(Steam.UIStore.RunningApps);
     const seenAppNames = new Set<string>();
 

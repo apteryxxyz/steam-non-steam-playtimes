@@ -1,35 +1,38 @@
-import OnLibraryAppLoaded from './library-app/index.jsx';
-import { monitorActiveLocation } from './monitor/active-location.js';
-import { monitorRunningApps } from './monitor/running-apps.js';
 import logger from './logger.js';
-import { onAppPing, onAppStart, onAppStop } from './rpc.js';
+import { monitorLocation } from './monitors/location.js';
+import { monitorPopups } from './monitors/popups.js';
+import { monitorRunningApps } from './monitors/running-apps.js';
+import OnLibraryAppLoaded from './mutators/library-app.jsx';
+import OnLibraryHomeLoaded from './mutators/library-home.jsx';
+import rpc from './rpc.js';
 import Steam from './steam.js';
+export { RPC } from './rpc.js';
 
-export default async function () {
-  const main = Steam.PopupManager.GetExistingPopup(Steam.MainWindowName);
-  if (main) OnWindowCreated(main);
-  Steam.PopupManager.AddPopupCreatedCallback(OnWindowCreated);
-
+export default async function OnPluginLoaded() {
   monitorRunningApps({
-    onStart: onAppStart,
-    onStill: onAppPing,
-    onStop: onAppStop,
+    onStart: rpc.OnAppStart.bind(rpc),
+    onStill: rpc.OnAppPing.bind(rpc),
+    onStop: rpc.OnAppStop.bind(rpc),
   });
-  logger.info('Starting to monitor running apps...');
-}
+  logger.info('Monitoring running apps...');
 
-async function OnWindowCreated(context: Steam.PopupContext) {
-  if (context.m_strName !== Steam.MainWindowName) return;
-
-  async function onChange(location: Steam.MainWindowBrowserLocation) {
-    if (location.pathname.startsWith('/library/app/'))
-      await OnLibraryAppLoaded(context.m_popup, location.pathname);
-  }
-
-  // Previously we used browser.on('finished-request') to monitor the current location
-  // but that was unreliable and was not always firing. This is a more reliable way
-  monitorActiveLocation({
-    onChange: onChange,
+  monitorPopups({
+    async onCreated(popup) {
+      if (popup.title !== 'Steam') return;
+      monitorLocation({
+        onChange(location) {
+          if (location.pathname === '/library/home') {
+            OnLibraryHomeLoaded();
+          } else if (location.pathname.startsWith('/library/app/')) {
+            const [, , , appId] = location.pathname.split('/');
+            const app = Steam.AppStore.allApps //
+              .find((a) => a.appid === Number(appId))!;
+            OnLibraryAppLoaded(popup.window!, app);
+          }
+        },
+      });
+      logger.info('Monitoring active location...');
+    },
   });
-  logger.info('Starting to monitor active location...');
+  logger.info('Monitoring popups...');
 }

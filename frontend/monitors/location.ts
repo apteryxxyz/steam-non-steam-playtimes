@@ -1,7 +1,7 @@
 import { waitFor } from '../helpers.js';
 import Steam from '../steam.js';
 
-export async function monitorActiveLocation({
+export async function monitorLocation({
   onChange,
 }: {
   onChange?: (location: Steam.MainWindowBrowserLocation) => void;

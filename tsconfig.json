@@ -42,7 +42,6 @@
     "skipLibCheck": true,
 
     "diagnostics": true,
-    "baseUrl": ".",
     "outDir": "./.millennium/Dist"
   }
 }
