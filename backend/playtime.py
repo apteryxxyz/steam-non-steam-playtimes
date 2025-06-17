@@ -45,7 +45,7 @@ def start_session(app_name: str, instance_id: str):
 def ping_session(app_name: str, instance_id: str):
   for session in _sessions[app_name]:
     if session.get("instance_id", None) == instance_id:
-      session["ended_at"]
+      session["ended_at"] = datetime.now(timezone.utc)
       save_sessions()
       break
 
