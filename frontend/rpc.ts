@@ -1,22 +1,23 @@
 import { Millennium } from '@steambrew/client';
-import { jsonReviver, type Tuple } from './helpers.js';
+import { jsonReplacer, jsonReviver, type Tuple } from './helpers.js';
 import type Steam from './steam.js';
 import logger from './logger.js';
 
-export class RPC {
-  #call<R>(route: string, payload: object): Promise<R> {
-    // Millennium build step for callable uses find and replace which doesn't always work
-    // (Sometimes the client variable will be called client$1 if you have another variable called client)
-    return Millennium.callServerMethod(route, payload) //
-      .then((r) => JSON.parse(r, jsonReviver));
-  }
+function call<R>(route: string, payload: object): Promise<R> {
+  // Millennium build step for callable uses find and replace which doesn't always work
+  // (Sometimes the client variable will be called client$1 if you have another variable called client)
+  return Millennium.callServerMethod(route, {
+    payload: JSON.stringify(payload, jsonReplacer),
+  }).then((r) => JSON.parse(r, jsonReviver));
+}
 
+export class RPC {
   async OnAppStart(app: Steam.AppOverview, instanceId: string) {
     if (app.size_on_disk !== '0') return;
     logger.info(
       `Non-steam app ${app.display_name} launched, starting session...`,
     );
-    return void this.#call('RPC.OnAppStart', {
+    await call('RPC.OnAppStart', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
@@ -24,7 +25,7 @@ export class RPC {
 
   async OnAppPing(app: Steam.AppOverview, instanceId: string) {
     if (app.size_on_disk !== '0') return;
-    return void this.#call('RPC.OnAppPing', {
+    await call('RPC.OnAppPing', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
@@ -35,7 +36,7 @@ export class RPC {
     logger.info(
       `Non-steam app ${app.display_name} stopped, stopping session...`,
     );
-    return void this.#call('RPC.OnAppStop', {
+    await call('RPC.OnAppStop', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
@@ -43,7 +44,7 @@ export class RPC {
 
   async GetPlaytimes<T extends readonly string[]>(appNames: T) {
     if (appNames.length === 0) return [];
-    const timings = await this.#call<any[]>('RPC.GetPlaytimes', {
+    const timings = await call<any[]>('RPC.GetPlaytimes', {
       app_names: appNames,
     });
     const formatted = timings.map((t) => ({

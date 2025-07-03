@@ -16,7 +16,7 @@
   "editor.insertSpaces": true,
   "editor.tabSize": 2,
   "typescript.preferences.importModuleSpecifierEnding": "js",
-  "cSpell.words": ["playtimes"],
+  "cSpell.words": ["playtimes", "rpcmethod"],
   "todo-tree.general.tags": ["=====", "NOTE", "IDEA", "TODO", "FIX", "HACK"],
   "todo-tree.highlights.customHighlight": {
     "=====": {
