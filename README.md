@@ -1,4 +1,4 @@
-# Non-Steam Playtimes
+# Non-Steam Playtimes <a href='https://ko-fi.com/X8X554X28' target='_blank'>☕</a>
 
 A Millennium plugin that tracks playtime for non-Steam games.
 
@@ -12,7 +12,7 @@ A Millennium plugin that tracks playtime for non-Steam games.
 
 ---
 
-![Screenshot](screenshots/example.png)
+![Screenshot](.github/example.png)
 
 ## Prerequisites
 
