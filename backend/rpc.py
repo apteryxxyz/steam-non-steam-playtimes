@@ -21,18 +21,18 @@ def rpcmethod(func: Callable):
 class RPC:
   @staticmethod
   @rpcmethod
-  def OnAppStart(app_name: str, instance_id: str):
+  def OnNonSteamAppStart(app_name: str, instance_id: str):
     print(f"Non-steam app {app_name} launched, starting session...")
     playtime.start_session(app_name, instance_id)
 
   @staticmethod
   @rpcmethod
-  def OnAppPing(app_name: str, instance_id: str):
+  def OnNonSteamAppStill(app_name: str, instance_id: str):
     playtime.ping_session(app_name, instance_id)
 
   @staticmethod
   @rpcmethod
-  def OnAppStop(app_name: str, instance_id: str):
+  def OnNonSteamAppStop(app_name: str, instance_id: str):
     print(f"Non-steam app {app_name} stopped, ending session...")
     playtime.stop_session(app_name, instance_id)
 

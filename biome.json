@@ -1,14 +1,16 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["node_modules/*", ".millennium/*"]
+    "includes": ["**", "!**/node_modules/**/*", "!**/.millennium/**/*"]
   },
+
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf"
   },
+
   "linter": {
     "enabled": true,
     "rules": {
@@ -25,8 +27,13 @@
       }
     }
   },
-  "organizeImports": {
-    "enabled": true
+
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
 
   "javascript": {

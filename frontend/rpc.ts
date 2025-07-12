@@ -1,7 +1,7 @@
 import { Millennium } from '@steambrew/client';
 import { jsonReplacer, jsonReviver, type Tuple } from './helpers.js';
-import type Steam from './steam.js';
 import logger from './logger.js';
+import type Steam from './steam.js';
 
 function call<R>(route: string, payload: object): Promise<R> {
   // Millennium build step for callable uses find and replace which doesn't always work
@@ -12,31 +12,28 @@ function call<R>(route: string, payload: object): Promise<R> {
 }
 
 export class RPC {
-  async OnAppStart(app: Steam.AppOverview, instanceId: string) {
-    if (app.size_on_disk !== '0') return;
+  async OnNonSteamAppStart(app: Steam.AppOverview, instanceId: string) {
     logger.info(
       `Non-steam app ${app.display_name} launched, starting session...`,
     );
-    await call('RPC.OnAppStart', {
+    await call('RPC.OnNonSteamAppStart', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
   }
 
-  async OnAppPing(app: Steam.AppOverview, instanceId: string) {
-    if (app.size_on_disk !== '0') return;
-    await call('RPC.OnAppPing', {
+  async OnNonSteamAppStill(app: Steam.AppOverview, instanceId: string) {
+    await call('RPC.OnNonSteamAppStill', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
   }
 
-  async OnAppStop(app: Steam.AppOverview, instanceId: string) {
-    if (app.size_on_disk !== '0') return;
+  async OnNonSteamAppStop(app: Steam.AppOverview, instanceId: string) {
     logger.info(
       `Non-steam app ${app.display_name} stopped, stopping session...`,
     );
-    await call('RPC.OnAppStop', {
+    await call('RPC.OnNonSteamAppStop', {
       app_name: app.display_name,
       instance_id: instanceId,
     });

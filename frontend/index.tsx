@@ -10,9 +10,18 @@ export { RPC } from './rpc.js';
 
 export default async function OnPluginLoaded() {
   monitorRunningApps({
-    onStart: rpc.OnAppStart.bind(rpc),
-    onStill: rpc.OnAppPing.bind(rpc),
-    onStop: rpc.OnAppStop.bind(rpc),
+    onStart(app, instanceId) {
+      if (app.size_on_disk !== '0') return;
+      rpc.OnNonSteamAppStart(app, instanceId);
+    },
+    onStill(app, instanceId) {
+      if (app.size_on_disk !== '0') return;
+      rpc.OnNonSteamAppStill(app, instanceId);
+    },
+    onStop(app, instanceId) {
+      if (app.size_on_disk !== '0') return;
+      rpc.OnNonSteamAppStop(app, instanceId);
+    },
   });
   logger.info('Monitoring running apps...');
 
