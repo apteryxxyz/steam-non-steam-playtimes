@@ -4,9 +4,9 @@ type SB_AppOverview = NonNullable<
   ReturnType<(typeof window)['appStore']['GetAppOverviewByAppID']>
 >;
 
-// ===== PopupManager ===== //
-
 namespace Steam {
+  // ===== PopupManager ===== //
+
   export interface PopupManager {
     GetExistingPopup(name: string): Popup;
     AddPopupCreatedCallback(callback: (popup: Popup) => void): void;
@@ -25,11 +25,9 @@ namespace Steam {
     get window(): Window | undefined;
     get root_element(): Element;
   }
-}
 
-// ===== MainWindowBrowser ===== //
+  // ===== MainWindowBrowser ===== //
 
-namespace Steam {
   export interface MainWindowBrowserManager {
     m_browser: MainWindowBrowser;
     m_lastActiveTab: 'store' | 'library' | 'community' | (string & {});
@@ -59,11 +57,9 @@ namespace Steam {
     enumerable: true,
     configurable: true,
   });
-}
 
-// ===== LocalizationManager ===== //
+  // ===== LocalizationManager ===== //
 
-namespace Steam {
   export interface LocalizationManager {
     m_mapTokens: Map<string, string>;
     LocalizeString(token: `#${string}`): string;
@@ -73,11 +69,9 @@ namespace Steam {
     globalThis,
     'LocalizationManager',
   );
-}
 
-// ===== AppOverview ===== //
+  // ===== AppOverview ===== //
 
-namespace Steam {
   interface BaseAppOverview extends Omit<SB_AppOverview, 'size_on_disk'> {
     appid: number;
     display_name: string;
@@ -95,33 +89,27 @@ namespace Steam {
   }
 
   export type AppOverview = SteamAppOverview | NonSteamAppOverview;
-}
 
-// ===== UIStore ===== //
+  // ===== UIStore ===== //
 
-namespace Steam {
   export interface UIStore {
     RunningApps: AppOverview[];
   }
 
   export const UIStore: UIStore = //
     Reflect.get(globalThis, 'SteamUIStore');
-}
 
-// ===== AppStore ===== //
+  // ===== AppStore ===== //
 
-namespace Steam {
   export interface AppStore {
     allApps: AppOverview[];
   }
 
   export const AppStore: AppStore = //
     Reflect.get(globalThis, 'appStore');
-}
 
-// ===== CollectionStore ===== //
+  // ===== CollectionStore ===== //
 
-namespace Steam {
   export interface CollectionStore {
     OnAppOverviewChange(apps: AppOverview[]): void;
   }

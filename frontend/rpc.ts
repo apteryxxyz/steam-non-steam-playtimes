@@ -1,9 +1,14 @@
 import { Millennium } from '@steambrew/client';
 import { jsonReplacer, jsonReviver, type Tuple } from './helpers.js';
-import logger from './logger.js';
 import type Steam from './steam.js';
 
-function call<R>(route: string, payload: object): Promise<R> {
+/**
+ * Call a method on the server
+ * @param route The route to call, must be prefixed with `RPC.`
+ * @param payload The payload to send
+ * @returns The response from the server
+ */
+function call<R>(route: `RPC.${string}`, payload: object): Promise<R> {
   // Millennium build step for callable uses find and replace which doesn't always work
   // (Sometimes the client variable will be called client$1 if you have another variable called client)
   return Millennium.callServerMethod(route, {
@@ -13,9 +18,6 @@ function call<R>(route: string, payload: object): Promise<R> {
 
 export class RPC {
   async OnNonSteamAppStart(app: Steam.AppOverview, instanceId: string) {
-    logger.info(
-      `Non-steam app ${app.display_name} launched, starting session...`,
-    );
     await call('RPC.OnNonSteamAppStart', {
       app_name: app.display_name,
       instance_id: instanceId,
@@ -30,9 +32,6 @@ export class RPC {
   }
 
   async OnNonSteamAppStop(app: Steam.AppOverview, instanceId: string) {
-    logger.info(
-      `Non-steam app ${app.display_name} stopped, stopping session...`,
-    );
     await call('RPC.OnNonSteamAppStop', {
       app_name: app.display_name,
       instance_id: instanceId,

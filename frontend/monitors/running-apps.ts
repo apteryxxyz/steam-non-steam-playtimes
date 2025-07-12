@@ -1,5 +1,9 @@
 import Steam from '../steam.js';
 
+/**
+ * Monitor the running applications that have been launched via Steam
+ * @param options Options for the monitor
+ */
 export async function monitorRunningApps({
   onStart,
   onStill,
@@ -14,7 +18,6 @@ export async function monitorRunningApps({
   const instanceIds = new Map<string, string>();
 
   while (!signal?.aborted) {
-    // There's probably a proper way of registering a listener for this, but this is easier for now
     const currentApps = new Set(Steam.UIStore.RunningApps);
     const seenAppNames = new Set<string>();
 
@@ -40,6 +43,7 @@ export async function monitorRunningApps({
       }
     }
 
+    // Wait a bit before checking again
     await new Promise((r) => setTimeout(r, 5000));
   }
 }

@@ -8,6 +8,9 @@ import playtime
 
 
 def rpcmethod(func: Callable):
+  """
+  Decorator for RPC methods, handling JSON serialisation and deserialisation
+  """
   args_names = func.__code__.co_varnames[:func.__code__.co_argcount]
   @wraps(func)
   def wrapper_func(payload: str):
@@ -22,7 +25,6 @@ class RPC:
   @staticmethod
   @rpcmethod
   def OnNonSteamAppStart(app_name: str, instance_id: str):
-    print(f"Non-steam app {app_name} launched, starting session...")
     playtime.start_session(app_name, instance_id)
 
   @staticmethod
@@ -33,7 +35,6 @@ class RPC:
   @staticmethod
   @rpcmethod
   def OnNonSteamAppStop(app_name: str, instance_id: str):
-    print(f"Non-steam app {app_name} stopped, ending session...")
     playtime.stop_session(app_name, instance_id)
 
   @staticmethod

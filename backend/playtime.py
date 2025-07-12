@@ -34,6 +34,7 @@ def save_sessions():
 #
 
 def start_session(app_name: str, instance_id: str):
+  print(f"Non-steam app {app_name} launched, starting session...")
   if not app_name in _sessions: _sessions[app_name] = []
   now = datetime.now(timezone.utc)
   _sessions[app_name].append({
@@ -43,6 +44,8 @@ def start_session(app_name: str, instance_id: str):
   })
 
 def ping_session(app_name: str, instance_id: str):
+  # Avoid spamming the console with this
+  # print(f"Non-steam app {app_name} still running, pinging session...")
   for session in _sessions[app_name]:
     if session.get("instance_id", None) == instance_id:
       session["ended_at"] = datetime.now(timezone.utc)
@@ -50,6 +53,7 @@ def ping_session(app_name: str, instance_id: str):
       break
 
 def stop_session(app_name: str, instance_id: str):
+  print(f"Non-steam app {app_name} stopped, ending session...")
   for session in _sessions[app_name]:
     if session.get("instance_id", None) == instance_id:
       session["ended_at"] = datetime.now(timezone.utc)

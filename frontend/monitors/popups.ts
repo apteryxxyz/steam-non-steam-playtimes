@@ -1,5 +1,9 @@
 import Steam from '../steam.js';
 
+/**
+ * Monitor Steam popups/windows
+ * @param options Options for the monitor
+ */
 export async function monitorPopups({
   onCreated,
 }: {

@@ -1,7 +1,7 @@
-import type Steam from '../steam.js';
 import { querySelectorAll, renderComponent } from '../helpers.js';
-import { LastPlayed, PlayBarClasses, Playtime } from './play-bar.js';
 import rpc from '../rpc.js';
+import type Steam from '../steam.js';
+import { LastPlayed, PlayBarClasses, Playtime } from './play-bar.js';
 
 export default async function OnLibraryAppLoaded(
   window: Window,

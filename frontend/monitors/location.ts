@@ -1,6 +1,10 @@
 import { waitFor } from '../helpers.js';
 import Steam from '../steam.js';
 
+/**
+ * Monitor the location of the Steam window
+ * @param options Options for the monitor
+ */
 export async function monitorLocation({
   onChange,
 }: {

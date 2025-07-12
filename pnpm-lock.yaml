@@ -12,10 +12,10 @@ importers:
         specifier: ^5.4.6
         version: 5.4.6
       react:
-        specifier: ^18.3.1
+        specifier: 18.3.1
         version: 18.3.1
       react-dom:
-        specifier: ^18.3.1
+        specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
       '@biomejs/biome':
@@ -25,10 +25,10 @@ importers:
         specifier: ^2.6.3
         version: 2.6.3(@babel/core@7.27.4)(typescript@4.9.5)
       '@types/react':
-        specifier: ^18.3.23
+        specifier: 18.3.23
         version: 18.3.23
       '@types/react-dom':
-        specifier: ^18.3.7
+        specifier: 18.3.7
         version: 18.3.7(@types/react@18.3.23)
 
 packages:

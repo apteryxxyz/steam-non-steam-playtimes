@@ -3,19 +3,19 @@
   "packageManager": "pnpm@10.13.1",
   "private": true,
   "scripts": {
-    "format": "biome format . --write",
+    "format": "biome check . --write",
     "build": "millennium-ttc --build prod",
     "dev": "powershell -ExecutionPolicy Bypass -File dev.ps1"
   },
   "dependencies": {
     "@steambrew/client": "^5.4.6",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.1",
     "@steambrew/ttc": "^2.6.3",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7"
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.7"
   }
 }
