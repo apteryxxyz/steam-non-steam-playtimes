@@ -29,6 +29,20 @@ export default async function OnPluginLoaded() {
         { app, instanceId },
       );
       rpc.OnNonSteamAppStill(app, instanceId);
+
+      if (
+        `/library/app/${app.appid}` ===
+        Steam.MainWindowBrowserManager.m_lastLocation.pathname
+      ) {
+        const popup = Steam.PopupManager.GetExistingPopup(Steam.MainWindowName);
+        if (popup?.window) {
+          logger.debug(
+            'Library app page detected, refreshing mutation...', //
+            { app, popup },
+          );
+          OnLibraryAppLoaded(popup.window, app);
+        }
+      }
     },
 
     onStop(app, instanceId) {

@@ -8,7 +8,7 @@ namespace Steam {
   // ===== PopupManager ===== //
 
   export interface PopupManager {
-    GetExistingPopup(name: string): Popup;
+    GetExistingPopup(name: string): Popup | undefined;
     AddPopupCreatedCallback(callback: (popup: Popup) => void): void;
   }
 

@@ -21,19 +21,23 @@ export default async function OnLibraryAppLoaded(
 
   for (const parent of parents) {
     if (lastPlayedAt) {
-      parent.querySelector('[data-nsp=last-played]')?.remove();
       const component = <LastPlayed lastPlayedAt={lastPlayedAt} />;
       const element = renderComponent(component);
       element.setAttribute('data-nsp', 'last-played');
-      parent.appendChild(element);
+
+      const existing = parent.querySelector('[data-nsp=last-played]');
+      if (existing) existing.replaceWith(element);
+      else parent.appendChild(element);
     }
 
     if (minutesForever > 0) {
-      parent.querySelector('[data-nsp=playtime]')?.remove();
       const component = <Playtime minutesForever={minutesForever} />;
       const element = renderComponent(component);
       element.setAttribute('data-nsp', 'playtime');
-      parent.appendChild(element);
+
+      const existing = parent.querySelector('[data-nsp=playtime]');
+      if (existing) existing.replaceWith(element);
+      else parent.appendChild(element);
     }
   }
 }
