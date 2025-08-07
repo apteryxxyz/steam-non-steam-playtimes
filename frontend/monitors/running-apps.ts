@@ -1,10 +1,12 @@
 import Steam from '../steam.js';
 
+const MONITOR_RUNNING_APPS_POLL_INTERVAL = 10_000;
+
 /**
  * Monitor the running applications that have been launched via Steam
  * @param options Options for the monitor
  */
-export async function monitorRunningApps({
+export function monitorRunningApps({
   onStart,
   onStill,
   onStop,
@@ -17,7 +19,9 @@ export async function monitorRunningApps({
 }) {
   const instanceIds = new Map<string, string>();
 
-  while (!signal?.aborted) {
+  const monitor = setInterval(() => {
+    if (signal?.aborted) return clearInterval(monitor);
+
     const currentApps = new Set(Steam.UIStore.RunningApps);
     const seenAppNames = new Set<string>();
 
@@ -42,8 +46,5 @@ export async function monitorRunningApps({
         onStop?.(app, instanceId);
       }
     }
-
-    // Wait a bit before checking again
-    await new Promise((r) => setTimeout(r, 10_000));
-  }
+  }, MONITOR_RUNNING_APPS_POLL_INTERVAL);
 }
