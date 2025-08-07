@@ -2,6 +2,8 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 import json
 from typing import TypedDict, NotRequired
+import tempfile
+import os
 
 from helpers import json_replacer, json_reviver
 from __main__ import PLUGIN_BASE_DIR
@@ -21,15 +23,26 @@ _sessions: dict[str, list[Session]] = {}
 def load_sessions():
   global _sessions
   if SESSIONS_PATH.exists():
-    with open(SESSIONS_PATH, "r") as f:
-      _sessions = json.load(f, object_hook=json_reviver)
+    try:
+      with open(SESSIONS_PATH, "r") as f:
+        _sessions = json.load(f, object_hook=json_reviver)
+    except json.JSONDecodeError:
+      # Create a backup of the corrupted file
+      now = datetime.now(timezone.utc)
+      os.rename(SESSIONS_PATH, SESSIONS_PATH.as_posix() + f".{now.strftime('%Y-%m-%d_%H-%M-%S')}.bak")
+
+      print("Warning: sessions.json is corrupted, starting with empty session data")
+      _sessions = {}
 
 def save_sessions():
   # This could eventually become out of hand if there are a lot of sessions
   # Perhaps sessions should be collapsed when they are over two weeks old (the reason sessions even exist)
-  SESSIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
-  with open(SESSIONS_PATH, "w") as f:
-    json.dump(_sessions, f, indent=2, default=json_replacer)
+
+  # Save to a temp file to avoid corrupting the original
+  with tempfile.NamedTemporaryFile(mode="w", dir=str(SESSIONS_PATH.parent), delete=False) as tf:
+    json.dump(_sessions, tf, indent=2, default=json_replacer)
+    temp_path = Path(tf.name)
+  temp_path.replace(SESSIONS_PATH)
 
 #
 
