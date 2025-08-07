@@ -3,3 +3,4 @@ node_modules/
 python_modules/
 .millennium/
 sessions.json
+sessions.json.*.bak
