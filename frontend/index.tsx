@@ -1,3 +1,4 @@
+import { NON_STEAM_APP_APPID_MASK } from './constants.js';
 import logger from './logger.js';
 import { monitorLocation } from './monitors/location.js';
 import { monitorPopups } from './monitors/popups.js';
@@ -13,8 +14,7 @@ export default async function OnPluginLoaded() {
   // Monitor running applications to track non-steam app playtime sessions
   monitorRunningApps({
     onStart(app, instanceId) {
-      // size_on_disk being '0' means it is a non-steam app
-      if (app.size_on_disk !== '0') return;
+      if (app.appid < NON_STEAM_APP_APPID_MASK) return;
       logger.debug(
         `Non-steam app ${app.display_name} launched, starting session...`,
         { app, instanceId },
@@ -23,7 +23,7 @@ export default async function OnPluginLoaded() {
     },
 
     onStill(app, instanceId) {
-      if (app.size_on_disk !== '0') return;
+      if (app.appid < NON_STEAM_APP_APPID_MASK) return;
       logger.debug(
         `Non-steam app ${app.display_name} still running, pinging session...`,
         { app, instanceId },
@@ -46,7 +46,7 @@ export default async function OnPluginLoaded() {
     },
 
     onStop(app, instanceId) {
-      if (app.size_on_disk !== '0') return;
+      if (app.appid < NON_STEAM_APP_APPID_MASK) return;
       logger.debug(
         `Non-steam app ${app.display_name} stopped, stopping session...`,
         { app, instanceId },

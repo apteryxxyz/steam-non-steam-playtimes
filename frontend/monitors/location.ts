@@ -1,11 +1,10 @@
+import { MONITOR_LOCATION_POLL_INTERVAL } from '../constants.js';
 import { waitFor } from '../helpers.js';
 import Steam from '../steam.js';
 
 // In previous versions of this, it just added a listener on history, but
 // for whatever reason, when exiting Big Picture mode, the listener would
 // be removed
-
-const MONITOR_LOCATION_POLL_INTERVAL = 500;
 
 /**
  * Monitor the location of the Steam window

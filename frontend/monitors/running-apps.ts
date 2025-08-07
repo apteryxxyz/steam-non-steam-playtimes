@@ -1,6 +1,5 @@
+import { MONITOR_RUNNING_APPS_POLL_INTERVAL } from '../constants.js';
 import Steam from '../steam.js';
-
-const MONITOR_RUNNING_APPS_POLL_INTERVAL = 10_000;
 
 /**
  * Monitor the running applications that have been launched via Steam

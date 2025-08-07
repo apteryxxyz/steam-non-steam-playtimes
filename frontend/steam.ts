@@ -78,17 +78,7 @@ namespace Steam {
     sort_as: string;
   }
 
-  export interface SteamAppOverview extends BaseAppOverview {
-    library_id: string;
-    size_on_disk: `${number}` | undefined;
-  }
-
-  export interface NonSteamAppOverview extends BaseAppOverview {
-    library_id: undefined;
-    size_on_disk: '0';
-  }
-
-  export type AppOverview = SteamAppOverview | NonSteamAppOverview;
+  export type AppOverview = BaseAppOverview;
 
   // ===== UIStore ===== //
 
