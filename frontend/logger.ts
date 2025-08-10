@@ -9,8 +9,10 @@ class Logger {
   get #badgeStyle() {
     const hash = [...this.#badgeText] //
       .reduce((h, c) => (h << 5) - h + c.charCodeAt(0), 0);
-    const hex = `#${(hash & 0xffffff).toString(16).padStart(6, '0')}`;
-    return `background: ${hex}; color: white;`;
+    const hex = (hash & 0xffffff).toString(16).padStart(6, '0');
+    const [r, g, b] = hex.match(/.{2}/g)!.map((x) => parseInt(x, 16));
+    const luminance = 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+    return `background: #${hex}; color: ${luminance > 128 ? 'black' : 'white'};`;
   }
 
   #log(log: typeof console.log, ...args: unknown[]) {
