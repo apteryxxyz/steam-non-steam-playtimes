@@ -14,7 +14,7 @@ export async function monitorLocation({
   onChange,
   signal,
 }: {
-  onChange?: (location: Steam.MainWindowBrowserLocation) => void;
+  onChange?: (location: Steam.MainWindowBrowserLocation) => Promise<void>;
   signal?: AbortSignal;
 }) {
   await waitFor(() => Steam.MainWindowBrowserManager);
@@ -27,6 +27,6 @@ export async function monitorLocation({
     const location = Steam.MainWindowBrowserManager.m_lastLocation;
     if (lastLocation.pathname === location.pathname) return;
     lastLocation = location;
-    onChange?.(location);
+    onChange?.(location)?.catch(console.error);
   }, MONITOR_LOCATION_POLL_INTERVAL);
 }
