@@ -1,4 +1,8 @@
-import { LastPlayed, PlayBarClasses, Playtime } from '../components/play-bar.js';
+import {
+  LastPlayed,
+  PlayBarClasses,
+  Playtime,
+} from '../components/play-bar.js';
 import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 import { querySelectorAll, renderComponent } from '../helpers.js';
 import rpc from '../rpc.js';

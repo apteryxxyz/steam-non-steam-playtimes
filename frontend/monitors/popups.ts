@@ -5,11 +5,11 @@ import Steam from '../steam.js';
  * @param options Options for the monitor
  */
 export async function monitorPopups({
-  onCreated,
+  onCreate,
 }: {
-  onCreated?(popup: Steam.Popup): void;
+  onCreate?(popup: Steam.Popup): void;
 }) {
   const mainWindow = Steam.PopupManager.GetExistingPopup(Steam.MainWindowName);
-  if (mainWindow && onCreated) onCreated(mainWindow);
-  if (onCreated) Steam.PopupManager.AddPopupCreatedCallback(onCreated);
+  if (mainWindow && onCreate) onCreate(mainWindow);
+  if (onCreate) Steam.PopupManager.AddPopupCreatedCallback(onCreate);
 }
