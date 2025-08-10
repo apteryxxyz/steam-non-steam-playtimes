@@ -3,8 +3,8 @@ import logger from './logger.js';
 import { monitorLocation } from './monitors/location.js';
 import { monitorPopups } from './monitors/popups.js';
 import { monitorRunningApps } from './monitors/running-apps.js';
-import OnLibraryAppLoaded from './mutators/library-app.jsx';
-import OnLibraryHomeLoaded from './mutators/library-home.jsx';
+import OnLibraryAppLoaded from './renderers/library-app.js';
+import OnLibraryHomeLoaded from './renderers/library-home.js';
 import rpc from './rpc.js';
 import Steam from './steam.js';
 
