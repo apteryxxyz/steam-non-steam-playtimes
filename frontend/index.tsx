@@ -16,7 +16,7 @@ export default async function OnPluginLoaded() {
   // Monitor running applications to track non-steam app playtime sessions
 
   monitorRunningApps({
-    onStart(app, instanceId) {
+    async onStart(app, instanceId) {
       if (app.appid < NON_STEAM_APP_APPID_MASK) return;
       logger.debug(
         `Non-steam app ${app.display_name} launched, starting session...`,
@@ -25,7 +25,7 @@ export default async function OnPluginLoaded() {
       rpc.OnNonSteamAppStart(app, instanceId);
     },
 
-    onStill(app, instanceId) {
+    async onStill(app, instanceId) {
       if (app.appid < NON_STEAM_APP_APPID_MASK) return;
       logger.debug(
         `Non-steam app ${app.display_name} still running, pinging session...`,
@@ -34,7 +34,7 @@ export default async function OnPluginLoaded() {
       rpc.OnNonSteamAppStill(app, instanceId);
 
       const isOnLibraryAppPage =
-        Steam.MainWindowBrowserManager.m_lastLocation.pathname ===
+        Steam.MainWindowBrowserManager?.m_lastLocation?.pathname ===
         `/library/app/${app.appid}`;
       if (isOnLibraryAppPage) {
         const popup = Steam.PopupManager.GetExistingPopup(Steam.MainWindowName);
@@ -48,7 +48,7 @@ export default async function OnPluginLoaded() {
       }
     },
 
-    onStop(app, instanceId) {
+    async onStop(app, instanceId) {
       if (app.appid < NON_STEAM_APP_APPID_MASK) return;
       logger.debug(
         `Non-steam app ${app.display_name} stopped, stopping session...`,
@@ -66,12 +66,12 @@ export default async function OnPluginLoaded() {
   // Monitor Steam popups to detect when library pages are loaded
 
   monitorPopups({
-    onCreate(popup) {
+    async onCreate(popup) {
       if (popup.title === 'Steam') {
         // ===== Monitor Main Window Location ===== //
 
         monitorLocation({
-          onChange(location) {
+          async onChange(location) {
             const { pathname } = location;
 
             if (pathname.startsWith('/library/app/')) {
