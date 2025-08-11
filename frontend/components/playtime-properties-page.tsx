@@ -7,7 +7,7 @@ import Steam from '../steam.js';
 
 const ms = createMs({
   formatOptions: {
-    includedUnits: ['day', 'hour', 'minute'],
+    includedUnits: ['hour', 'minute'],
     useAbbreviations: true,
   },
 });
@@ -28,23 +28,23 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
 
   const [saveState, setSaveState] = useState('Save');
   const updatePlaytime = useCallback(async () => {
-try {
-    setSaveState('Saving...');
-const minutesForever = playtimeMs / Time.Minute;
-    await rpc.SetPlaytime(app.display_name, minutesForever);
-app.minutes_playtime_forever = minutesForever;
-    setSaveState('Saved');
+    try {
+      setSaveState('Saving...');
+      const minutesForever = playtimeMs / Time.Minute;
+      await rpc.SetPlaytime(app.display_name, minutesForever);
+      app.minutes_playtime_forever = minutesForever;
+      setSaveState('Saved');
     } catch (e) {
       setSaveState('Failed');
       logger.debug('Failed to set playtime', e);
     } finally {
       setInterval(() => {
-      setSaveState('Save');
-      // Force location monitor to detect a "refresh" of the page to
-      // instantly update the playtime
-      Steam.MainWindowBrowserManager.m_lastLocation.hash += 'r';
-    }, 2000);
-}
+        setSaveState('Save');
+        // Force location monitor to detect a "refresh" of the page to
+        // instantly update the playtime
+        Steam.MainWindowBrowserManager.m_lastLocation.hash += 'r';
+      }, 2000);
+    }
   }, [app, playtimeMs]);
 
   return (
