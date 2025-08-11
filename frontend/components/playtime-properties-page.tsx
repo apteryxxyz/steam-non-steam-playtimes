@@ -30,7 +30,7 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
   const updatePlaytime = useCallback(async () => {
     try {
       setSaveState('Saving...');
-      const minutesForever = playtimeMs / Time.Minute;
+      const minutesForever = Math.round(playtimeMs / Time.Minute);
       await rpc.SetPlaytime(app.display_name, minutesForever);
       app.minutes_playtime_forever = minutesForever;
       setSaveState('Saved');
