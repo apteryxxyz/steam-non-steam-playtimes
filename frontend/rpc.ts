@@ -39,7 +39,8 @@ export class RPC {
   }
 
   async GetPlaytimes<T extends readonly string[]>(appNames: T) {
-    if (appNames.length === 0) return [];
+    if (appNames.length === 0)
+      return [] as Tuple<(typeof formatted)[number], T['length']>;
     const timings = await call<any[]>('RPC.GetPlaytimes', {
       app_names: appNames,
     });
@@ -49,6 +50,13 @@ export class RPC {
       lastPlayedAt: t.last_played_at as Date | null,
     }));
     return formatted as Tuple<(typeof formatted)[number], T['length']>;
+  }
+
+  async SetPlaytime(appName: string, minutesForever: number) {
+    await call('RPC.SetPlaytime', {
+      app_name: appName,
+      minutes_forever: minutesForever,
+    });
   }
 }
 

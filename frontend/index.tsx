@@ -3,8 +3,9 @@ import logger from './logger.js';
 import { monitorLocation } from './monitors/location.js';
 import { monitorPopups } from './monitors/popups.js';
 import { monitorRunningApps } from './monitors/running-apps.js';
+import './renderers/app-properties.js';
 import OnLibraryAppLoaded from './renderers/library-app.js';
-import OnLibraryHomeLoaded from './renderers/library-home.js';
+import './renderers/library-home.js';
 import rpc from './rpc.js';
 import Steam from './steam.js';
 
@@ -73,12 +74,7 @@ export default async function OnPluginLoaded() {
           async onChange(location) {
             const { pathname } = location;
 
-            if (pathname === '/library/home') {
-              logger.debug('Library home page detected');
-              OnLibraryHomeLoaded();
-            }
-            //
-            else if (pathname.startsWith('/library/app/')) {
+            if (pathname.startsWith('/library/app/')) {
               const appId = Number(pathname.split('/')[3]);
               const app = Steam.AppStore.allApps //
                 .find((a) => a.appid === appId)!;

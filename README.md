@@ -20,6 +20,10 @@ A Millennium plugin that tracks playtime for non-Steam games.
 
 ## Notes & Troubleshooting
 
+### Manually Set Playtime
+
+If you want to manually set the playtime for a non-Steam app, you can do so by opening the app's properties page and clicking the "Playtime" button. This is useful if you want to manually set the playtime for a game that you've already played.
+
 ### Data Location
 
 Session data is stored in `<STEAM>/plugins/non-steam-playtimes/sessions.json`. If you ever want to say reinstall your OS and want to keep your non-Steam playtimes, **backup this file** and restore it on the new PC to get your playtimes back.
