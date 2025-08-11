@@ -1,5 +1,6 @@
 import { beforePatch } from '@steambrew/client';
 import { PlaytimePropertiesPage } from '../components/playtime-properties-page.js';
+import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 import { waitFor } from '../helpers.js';
 import logger from '../logger.js';
 import Steam from '../steam.js';
@@ -53,6 +54,7 @@ function isAppPropertiesPage(page: unknown): page is AppPropertiesPage {
       );
 
       const appId = Number(this[0]!.link.split('/')[2]);
+      if (Number.isNaN(appId) || appId < NON_STEAM_APP_APPID_MASK) return;
       const app = Steam.AppStore.allApps.find((a) => a.appid === appId)!;
 
       this.push({
