@@ -1,6 +1,7 @@
 import { Button, findClassModule, TextField } from '@steambrew/client';
 import { createMs, Time } from 'enhanced-ms';
 import { useCallback, useMemo, useState } from 'react';
+import logger from '../logger.js';
 import rpc from '../rpc.js';
 import Steam from '../steam.js';
 
@@ -14,26 +15,37 @@ const ms = createMs({
 const SettingsStyles = findClassModule((m) => m.SectionTopLine)!;
 
 export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
-  const [minutesForever, setMinutesForever] = //
-    useState(app.minutes_playtime_forever);
-  const [initialMinutesForever] = useState(minutesForever);
+  const [playtimeMs, setPlaytimeMs] = //
+    useState(app.minutes_playtime_forever * Time.Minute);
+  const [initialPlaytime] = useState(() => ms(playtimeMs) ?? '');
   const isValid = useMemo(
-    () => !Number.isNaN(minutesForever) || minutesForever > Time.Year * 25,
-    [minutesForever],
+    () =>
+      Number.isFinite(playtimeMs) &&
+      playtimeMs >= 0 &&
+      playtimeMs <= Time.Year * 25,
+    [playtimeMs],
   );
 
   const [saveState, setSaveState] = useState('Save');
-  const setPlaytime = useCallback(async () => {
+  const updatePlaytime = useCallback(async () => {
+try {
     setSaveState('Saving...');
+const minutesForever = playtimeMs / Time.Minute;
     await rpc.SetPlaytime(app.display_name, minutesForever);
+app.minutes_playtime_forever = minutesForever;
     setSaveState('Saved');
-    setTimeout(() => {
+    } catch (e) {
+      setSaveState('Failed');
+      logger.debug('Failed to set playtime', e);
+    } finally {
+      setInterval(() => {
       setSaveState('Save');
       // Force location monitor to detect a "refresh" of the page to
       // instantly update the playtime
       Steam.MainWindowBrowserManager.m_lastLocation.hash += 'r';
     }, 2000);
-  }, [app.display_name, minutesForever]);
+}
+  }, [app, playtimeMs]);
 
   return (
     <div className="DialogBody">
@@ -45,10 +57,10 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
         </div>
         <div className={SettingsStyles.AsyncBackedInputChildren}>
           <TextField
-            defaultValue={ms(initialMinutesForever * 60 * 1000) ?? ''}
+            defaultValue={initialPlaytime}
             onChange={(e) => {
-              if (e.target.value === '') setMinutesForever(0);
-              else setMinutesForever((ms(e.target.value) || NaN) / 1000 / 60);
+              if (e.target.value === '') setPlaytimeMs(0);
+              else setPlaytimeMs(ms(e.target.value) || NaN);
             }}
             style={
               !isValid ? { border: 'red 1px solid', marginLeft: '1px' } : {}
@@ -56,7 +68,7 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
           />
           <Button
             className={`${SettingsStyles.SettingsDialogButton} ${SettingsStyles.ShortcutChange} DialogButton`}
-            onClick={setPlaytime}
+            onClick={updatePlaytime}
             disabled={!isValid}
           >
             {saveState}
