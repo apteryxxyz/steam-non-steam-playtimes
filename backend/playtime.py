@@ -116,3 +116,29 @@ def get_playtime(app_name: str):
     "minutes_last_two_weeks": minutes_last_two_weeks,
     "last_played_at": last_played_at,
   }
+
+def set_playtime(app_name: str, minutes_forever: int):
+  UNIX_EPOCH = datetime.fromtimestamp(0, timezone.utc)
+
+  sessions = _sessions.get(app_name, [])
+  current_minutes = sum(
+    (s["ended_at"] - s["started_at"]).total_seconds() / 60
+    for s in sessions
+  )
+
+  if minutes_forever >= current_minutes:
+    extra_minutes = minutes_forever - current_minutes
+    zero_session = next((s for s in sessions if s["started_at"] == UNIX_EPOCH), None)
+    if zero_session is None:
+      zero_session = {"started_at": UNIX_EPOCH, "ended_at": UNIX_EPOCH}
+      sessions.append(zero_session)
+    zero_session["ended_at"] += timedelta(minutes=extra_minutes)
+  else:
+    zero_session = {
+      "started_at": UNIX_EPOCH,
+      "ended_at": UNIX_EPOCH + timedelta(minutes=minutes_forever),
+    }
+    sessions = [zero_session]
+
+  _sessions[app_name] = sessions
+  save_sessions()

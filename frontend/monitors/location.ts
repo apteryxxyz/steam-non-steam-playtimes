@@ -19,14 +19,20 @@ export async function monitorLocation({
 }) {
   await waitFor(() => Steam.MainWindowBrowserManager);
 
-  let lastLocation = { pathname: '' };
+  let lastLocation = { pathname: '', search: '', hash: '' };
 
   const monitor = setInterval(() => {
     if (signal?.aborted) return clearInterval(monitor);
 
     const location = Steam.MainWindowBrowserManager.m_lastLocation;
-    if (lastLocation.pathname === location.pathname) return;
-    lastLocation = location;
+    if (
+      lastLocation.pathname === location.pathname &&
+      lastLocation.search === location.search &&
+      lastLocation.hash === location.hash
+    )
+      return;
+
+    lastLocation = structuredClone(location);
     onChange?.(location);
   }, MONITOR_LOCATION_POLL_INTERVAL);
 }

@@ -45,4 +45,9 @@ class RPC:
       for app_name in app_names
     ]
 
+  @staticmethod
+  @rpcmethod
+  def SetPlaytime(app_name: str, minutes_forever: int):
+    playtime.set_playtime(app_name, minutes_forever)
+
 rpc = RPC()

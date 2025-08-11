@@ -11,6 +11,9 @@ importers:
       '@steambrew/client':
         specifier: ^5.4.6
         version: 5.4.6
+      enhanced-ms:
+        specifier: ^4.1.0
+        version: 4.1.0
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -1134,6 +1137,9 @@ packages:
 
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
+
+  enhanced-ms@4.1.0:
+    resolution: {integrity: sha512-m2ERryfuotoqsbKA5h7Hgnihejp8ZYV9fNFq3TWkcmmQ+WDZjSELx076v/v0r7QMveeLGMqZINNjoa2v17/Vng==}
 
   es-define-property@1.0.1:
     resolution: {integrity: sha512-e3nRfgfUZ4rNGL232gUgX06QNyyez04KdjFrF+LTRoOXmrOgFKDg4BCdsjW8EnT69eqdYGmRpJwiPVYNrCaW3g==}
@@ -2860,6 +2866,8 @@ snapshots:
   emoji-regex@8.0.0: {}
 
   emoji-regex@9.2.2: {}
+
+  enhanced-ms@4.1.0: {}
 
   es-define-property@1.0.1: {}
 
