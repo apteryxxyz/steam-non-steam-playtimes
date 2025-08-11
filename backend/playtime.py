@@ -108,7 +108,7 @@ def get_playtime(app_name: str):
     minutes_forever += minutes
 
     # Update last_played_at if necessary
-    if started_at is not UNIX_EPOCH and (last_played_at is None or ended_at > last_played_at):
+    if started_at != UNIX_EPOCH and (last_played_at is None or ended_at > last_played_at):
       last_played_at = ended_at
 
   return {
