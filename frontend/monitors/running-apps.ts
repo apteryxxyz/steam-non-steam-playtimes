@@ -11,9 +11,9 @@ export function monitorRunningApps({
   onStop,
   signal,
 }: {
-  onStart?: (app: Steam.AppOverview, instanceId: string) => void;
-  onStill?: (app: Steam.AppOverview, instanceId: string) => void;
-  onStop?: (app: Steam.AppOverview, instanceId: string) => void;
+  onStart?: (app: Steam.AppOverview, instanceId: string) => Promise<void>;
+  onStill?: (app: Steam.AppOverview, instanceId: string) => Promise<void>;
+  onStop?: (app: Steam.AppOverview, instanceId: string) => Promise<void>;
   signal?: AbortSignal;
 }) {
   const instanceIds = new Map<string, string>();
@@ -30,11 +30,11 @@ export function monitorRunningApps({
       if (!instanceIds.has(app.display_name)) {
         const instanceId = Math.random().toString(36).slice(2);
         instanceIds.set(app.display_name, instanceId);
-        onStart?.(app, instanceId);
+        onStart?.(app, instanceId)?.catch(console.error);
       }
 
       const instanceId = instanceIds.get(app.display_name)!;
-      onStill?.(app, instanceId);
+      onStill?.(app, instanceId)?.catch(console.error);
     }
 
     for (const [name, instanceId] of instanceIds) {
@@ -42,7 +42,7 @@ export function monitorRunningApps({
         instanceIds.delete(name);
         const app = Steam.AppStore.allApps //
           .find((a) => a.display_name === name)!;
-        onStop?.(app, instanceId);
+        onStop?.(app, instanceId)?.catch(console.error);
       }
     }
   }, MONITOR_RUNNING_APPS_POLL_INTERVAL);

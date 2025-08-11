@@ -1,7 +1,7 @@
 import { beforePatch } from '@steambrew/client';
+import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 import rpc from '../rpc.js';
 import Steam from '../steam.js';
-import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 
 beforePatch(
   Steam.CollectionStore,

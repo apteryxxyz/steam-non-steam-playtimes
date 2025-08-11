@@ -1,8 +1,12 @@
+import {
+  LastPlayed,
+  PlayBarClasses,
+  Playtime,
+} from '../components/play-bar.js';
 import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 import { querySelectorAll, renderComponent } from '../helpers.js';
 import rpc from '../rpc.js';
 import type Steam from '../steam.js';
-import { LastPlayed, PlayBarClasses, Playtime } from './play-bar.js';
 
 export default async function OnLibraryAppLoaded(
   window: Window,

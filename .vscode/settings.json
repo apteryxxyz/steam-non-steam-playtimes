@@ -25,7 +25,7 @@
 
   // Code Spell Checker
   "cSpell.language": "en-AU",
-  "cSpell.words": ["playtimes", "rpcmethod"],
+  "cSpell.words": ["playtimes", "rpcmethod", "renderers"],
 
   // Todo Tree
   "todo-tree.general.tags": ["=====", "TODO"],
