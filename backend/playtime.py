@@ -34,10 +34,23 @@ def load_sessions():
       print("Warning: sessions.json is corrupted, starting with empty session data")
       _sessions = {}
 
-def save_sessions():
-  # This could eventually become out of hand if there are a lot of sessions
-  # Perhaps sessions should be collapsed when they are over two weeks old (the reason sessions even exist)
+def collapse_sessions():
+  TWO_WEEKS_AGO = datetime.now(timezone.utc) - timedelta(days=14)
+  UNIX_EPOCH = datetime.fromtimestamp(0, timezone.utc)
 
+  for sessions in _sessions.values():
+    zero_session = next((s for s in sessions if s["started_at"] == UNIX_EPOCH), None)
+    if zero_session is None:
+      zero_session = {"started_at": UNIX_EPOCH, "ended_at": UNIX_EPOCH}
+      sessions.append(zero_session)
+
+    old_sessions = [s for s in sessions if s is not zero_session and s["ended_at"] < TWO_WEEKS_AGO]
+    for session in old_sessions:
+      session_time = session["ended_at"] - session["started_at"]
+      zero_session["ended_at"] += session_time
+      sessions.remove(session)
+
+def save_sessions():
   # Save to a temp file to avoid corrupting the original
   with tempfile.NamedTemporaryFile(mode="w", dir=str(SESSIONS_PATH.parent), delete=False) as tf:
     json.dump(_sessions, tf, indent=2, default=json_replacer)
@@ -71,11 +84,13 @@ def stop_session(app_name: str, instance_id: str):
     if session.get("instance_id", None) == instance_id:
       session["ended_at"] = datetime.now(timezone.utc)
       del session["instance_id"]
+      collapse_sessions()
       save_sessions()
       break
 
 def get_playtime(app_name: str):
   TWO_WEEKS_AGO = datetime.now(timezone.utc) - timedelta(days=14)
+  UNIX_EPOCH = datetime.fromtimestamp(0, timezone.utc)
 
   minutes_forever = 0
   minutes_last_two_weeks = 0
@@ -93,7 +108,7 @@ def get_playtime(app_name: str):
     minutes_forever += minutes
 
     # Update last_played_at if necessary
-    if last_played_at is None or ended_at > last_played_at:
+    if started_at is not UNIX_EPOCH and (last_played_at is None or ended_at > last_played_at):
       last_played_at = ended_at
 
   return {
