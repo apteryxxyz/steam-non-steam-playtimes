@@ -35,15 +35,10 @@ function isAppPropertiesPage(page: unknown): page is AppPropertiesPage {
   const patch = beforePatch(
     Array.prototype,
     'map',
-    // @ts-ignore
-    function (
-      this: AppPropertiesPage[],
-      [callback]: [AppPropertiesPage[]['map']],
-    ) {
+    function (this: AppPropertiesPage[]) {
       if (
         this.length === 0 ||
         this.length > 20 ||
-        !callback.toString().includes('identifier:') ||
         !this.every(isAppPropertiesPage) ||
         this.some((p) => p.route === '/app/:appid/properties/playtime')
       )
