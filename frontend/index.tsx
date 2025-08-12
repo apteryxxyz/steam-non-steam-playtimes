@@ -1,6 +1,7 @@
 import './renderers/library-home.js';
 import './renderers/app-properties.js';
 import { NON_STEAM_APP_APPID_MASK } from './constants.js';
+import { forceFakeLocationChange } from './helpers.js';
 import logger from './logger.js';
 import { onLocationChange } from './monitors/location.js';
 import { onPopupCreate, PopupType } from './monitors/popups.js';
@@ -8,6 +9,8 @@ import { onAppLaunch } from './monitors/running-apps.js';
 import OnLibraryAppLoaded from './renderers/library-app.js';
 import rpc from './rpc.js';
 import Steam from './steam.js';
+
+export { RPC } from './rpc.js';
 
 export default async function OnPluginLoaded() {
   // ===== Monitor Running Apps ===== //
@@ -31,8 +34,7 @@ export default async function OnPluginLoaded() {
         { app, instanceId },
       );
       rpc.OnNonSteamAppHeartbeat(app, instanceId);
-      // TODO: Detect the mode and update the location accordingly
-      Steam.MainWindowBrowserManager.m_lastLocation.hash += 'r';
+      forceFakeLocationChange();
     });
 
     onQuit(() => {
@@ -52,15 +54,16 @@ export default async function OnPluginLoaded() {
   // Monitor Steam popups to detect when library pages are loaded
 
   onPopupCreate((popup, type) => {
-    if (type !== PopupType.Desktop) return;
+    if (type !== PopupType.Desktop && type !== PopupType.Gamepad) return;
 
     // ===== Monitor Main Window Location ===== //
 
     logger.info('Started monitoring location changes in Steam window');
     return onLocationChange(
       () => {
-        // if (type === PopupType.Gamepad) return popup.window?.opener?.location;
-        return Steam.MainWindowBrowserManager?.m_lastLocation;
+        if (type === PopupType.Desktop)
+          return Steam.MainWindowBrowserManager?.m_lastLocation;
+        if (type === PopupType.Gamepad) return popup.window?.opener?.location;
       },
       ({ pathname }) => {
         if (pathname.startsWith('/library/app/')) {
