@@ -1,9 +1,10 @@
 import { Button, findClassModule, TextField } from '@steambrew/client';
 import { createMs, Time } from 'enhanced-ms';
 import { useCallback, useMemo, useState } from 'react';
+import { forceFakeLocationChange } from '../helpers.js';
 import logger from '../logger.js';
 import rpc from '../rpc.js';
-import Steam from '../steam.js';
+import type Steam from '../steam.js';
 
 const ms = createMs({
   formatOptions: {
@@ -42,7 +43,7 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
         setSaveState('Save');
         // Force location monitor to detect a "refresh" of the page to
         // instantly update the playtime
-        Steam.MainWindowBrowserManager.m_lastLocation.hash += 'r';
+        forceFakeLocationChange();
       }, 2000);
     }
   }, [app, playtimeMs]);

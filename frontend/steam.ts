@@ -86,8 +86,15 @@ namespace Steam {
 
   // ===== UIStore ===== //
 
+  export enum UIMode {
+    Unknown = -1,
+    Gamepad = 4,
+    Desktop = 7,
+  }
+
   export interface UIStore {
-    RunningApps: AppOverview[];
+    get RunningApps(): AppOverview[];
+    get MainInstanceUIMode(): UIMode;
   }
 
   export const UIStore: UIStore = //
