@@ -17,10 +17,14 @@ export function onAppLaunch(
     },
   ) => Awaitable<Voidable<VoidFunction>>,
 ) {
+  let inFlight = false;
   const onHeartbeatMap = new Map<number, Set<VoidFunction>>();
   const onQuitMap = new Map<number, Set<VoidFunction>>();
 
   async function checkRunningApps() {
+    if (inFlight) return;
+    inFlight = true;
+
     const runningApps = new Set(Steam.UIStore.RunningApps);
     const seenAppNames = new Set<number>();
 
@@ -30,17 +34,20 @@ export function onAppLaunch(
       if (!onQuitMap.has(app.appid)) {
         onQuitMap.set(app.appid, new Set());
         onHeartbeatMap.set(app.appid, new Set());
+        const onLaunchSet = new Set<VoidFunction>();
 
         const onQuit = await onLaunch(app, {
-          onLaunch: (cb: VoidFunction) => cb(),
+          onLaunch: (cb: VoidFunction) => onLaunchSet.add(cb),
           onHeartbeat: (cb: VoidFunction) =>
             onHeartbeatMap.get(app.appid)!.add(cb),
           onQuit: (cb: VoidFunction) => onQuitMap.get(app.appid)!.add(cb),
         });
         if (onQuit) onQuitMap.get(app.appid)!.add(onQuit);
+
+        for (const cb of onLaunchSet) await cb();
       } else {
         const onHeartbeatSet = onHeartbeatMap.get(app.appid)!;
-        onHeartbeatSet.forEach((cb) => cb());
+        for (const cb of onHeartbeatSet) await cb();
       }
     }
 
@@ -48,9 +55,11 @@ export function onAppLaunch(
       if (!seenAppNames.has(appid)) {
         onQuitMap.delete(appid);
         onHeartbeatMap.delete(appid);
-        onQuitSet.forEach((cb) => cb());
+        for (const cb of onQuitSet) await cb();
       }
     }
+
+    inFlight = false;
   }
 
   checkRunningApps();

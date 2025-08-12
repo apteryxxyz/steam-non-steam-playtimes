@@ -27,9 +27,13 @@ export function onLocationChange(
   getLocation: NoInfer<() => Voidable<Location>>,
   onChange: (location: Location) => Awaitable<void>,
 ) {
+  let inFlight = false;
   let lastLocation: Location | undefined;
 
   async function checkLocation() {
+    if (inFlight) return;
+    inFlight = true;
+
     const currentLocation = getLocation();
     if (
       !currentLocation ||
@@ -39,7 +43,10 @@ export function onLocationChange(
     )
       return;
     lastLocation = { ...currentLocation };
+
     await onChange?.(normaliseLocation(currentLocation));
+
+    inFlight = false;
   }
 
   checkLocation();
