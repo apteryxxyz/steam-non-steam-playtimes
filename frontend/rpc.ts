@@ -17,22 +17,22 @@ function call<R>(route: `RPC.${string}`, payload: object): Promise<R> {
 }
 
 export class RPC {
-  async OnNonSteamAppStart(app: Steam.AppOverview, instanceId: string) {
-    await call('RPC.OnNonSteamAppStart', {
+  async OnNonSteamAppLaunch(app: Steam.AppOverview, instanceId: string) {
+    await call('RPC.OnNonSteamAppLaunch', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
   }
 
-  async OnNonSteamAppStill(app: Steam.AppOverview, instanceId: string) {
-    await call('RPC.OnNonSteamAppStill', {
+  async OnNonSteamAppHeartbeat(app: Steam.AppOverview, instanceId: string) {
+    await call('RPC.OnNonSteamAppHeartbeat', {
       app_name: app.display_name,
       instance_id: instanceId,
     });
   }
 
-  async OnNonSteamAppStop(app: Steam.AppOverview, instanceId: string) {
-    await call('RPC.OnNonSteamAppStop', {
+  async OnNonSteamAppQuit(app: Steam.AppOverview, instanceId: string) {
+    await call('RPC.OnNonSteamAppQuit', {
       app_name: app.display_name,
       instance_id: instanceId,
     });

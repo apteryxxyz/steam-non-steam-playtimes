@@ -22,7 +22,7 @@ export default async function OnPluginLoaded() {
         `Non-steam app ${app.display_name} launched, starting session...`,
         { app, instanceId },
       );
-      rpc.OnNonSteamAppStart(app, instanceId);
+      rpc.OnNonSteamAppLaunch(app, instanceId);
     });
 
     onHeartbeat(() => {
@@ -30,7 +30,7 @@ export default async function OnPluginLoaded() {
         `Non-steam app ${app.display_name} still running, pinging session...`,
         { app, instanceId },
       );
-      rpc.OnNonSteamAppStill(app, instanceId);
+      rpc.OnNonSteamAppHeartbeat(app, instanceId);
       // TODO: Detect the mode and update the location accordingly
       Steam.MainWindowBrowserManager.m_lastLocation.hash += 'r';
     });
@@ -40,7 +40,7 @@ export default async function OnPluginLoaded() {
         `Non-steam app ${app.display_name} stopped, stopping session...`,
         { app, instanceId },
       );
-      rpc.OnNonSteamAppStop(app, instanceId);
+      rpc.OnNonSteamAppQuit(app, instanceId);
     });
   });
 
