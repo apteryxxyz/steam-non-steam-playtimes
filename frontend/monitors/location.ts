@@ -32,7 +32,6 @@ export function onLocationChange(
 
   async function checkLocation() {
     if (inFlight) return;
-    inFlight = true;
 
     const currentLocation = getLocation();
     if (
@@ -44,8 +43,8 @@ export function onLocationChange(
       return;
     lastLocation = { ...currentLocation };
 
+    inFlight = true;
     await onChange?.(normaliseLocation(currentLocation));
-
     inFlight = false;
   }
 

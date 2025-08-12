@@ -44,10 +44,10 @@ export function onAppLaunch(
         });
         if (onQuit) onQuitMap.get(app.appid)!.add(onQuit);
 
-        for (const cb of onLaunchSet) await cb();
+        await Promise.allSettled([...onLaunchSet].map((cb) => cb()));
       } else {
         const onHeartbeatSet = onHeartbeatMap.get(app.appid)!;
-        for (const cb of onHeartbeatSet) await cb();
+        await Promise.allSettled([...onHeartbeatSet].map((cb) => cb()));
       }
     }
 
@@ -55,7 +55,7 @@ export function onAppLaunch(
       if (!seenAppNames.has(appid)) {
         onQuitMap.delete(appid);
         onHeartbeatMap.delete(appid);
-        for (const cb of onQuitSet) await cb();
+        await Promise.allSettled([...onQuitSet].map((cb) => cb()));
       }
     }
 
