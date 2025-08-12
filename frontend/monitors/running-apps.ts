@@ -1,49 +1,71 @@
 import { MONITOR_RUNNING_APPS_POLL_INTERVAL } from '../constants.js';
+import type { Awaitable, Voidable } from '../helpers.js';
 import Steam from '../steam.js';
 
 /**
- * Monitor the running applications that have been launched via Steam
- * @param options Options for the monitor
+ * Monitor running applications and trigger when they launch, quit or heartbeat
+ * @param onLaunch Callback to trigger when an app launches
+ * @returns A function to stop monitoring
  */
-export function monitorRunningApps({
-  onStart,
-  onStill,
-  onStop,
-  signal,
-}: {
-  onStart?: (app: Steam.AppOverview, instanceId: string) => Promise<void>;
-  onStill?: (app: Steam.AppOverview, instanceId: string) => Promise<void>;
-  onStop?: (app: Steam.AppOverview, instanceId: string) => Promise<void>;
-  signal?: AbortSignal;
-}) {
-  const instanceIds = new Map<string, string>();
+export function onAppLaunch(
+  onLaunch: (
+    app: Steam.AppOverview,
+    handlers: {
+      onLaunch: (onLaunch: VoidFunction) => void;
+      onHeartbeat: (onHeartbeat: VoidFunction) => void;
+      onQuit: (onQuit: VoidFunction) => void;
+    },
+  ) => Awaitable<Voidable<VoidFunction>>,
+) {
+  let inFlight = false;
+  const onHeartbeatMap = new Map<number, Set<VoidFunction>>();
+  const onQuitMap = new Map<number, Set<VoidFunction>>();
 
-  const monitor = setInterval(() => {
-    if (signal?.aborted) return clearInterval(monitor);
+  async function checkRunningApps() {
+    if (inFlight) return;
+    inFlight = true;
 
-    const currentApps = new Set(Steam.UIStore.RunningApps);
-    const seenAppNames = new Set<string>();
+    const runningApps = new Set(Steam.UIStore.RunningApps);
+    const seenAppNames = new Set<number>();
 
-    for (const app of currentApps) {
-      seenAppNames.add(app.display_name);
+    for (const app of runningApps) {
+      seenAppNames.add(app.appid);
 
-      if (!instanceIds.has(app.display_name)) {
-        const instanceId = Math.random().toString(36).slice(2);
-        instanceIds.set(app.display_name, instanceId);
-        onStart?.(app, instanceId)?.catch(console.error);
+      if (!onQuitMap.has(app.appid)) {
+        onQuitMap.set(app.appid, new Set());
+        onHeartbeatMap.set(app.appid, new Set());
+        const onLaunchSet = new Set<VoidFunction>();
+
+        const onQuit = await onLaunch(app, {
+          onLaunch: (cb: VoidFunction) => onLaunchSet.add(cb),
+          onHeartbeat: (cb: VoidFunction) =>
+            onHeartbeatMap.get(app.appid)!.add(cb),
+          onQuit: (cb: VoidFunction) => onQuitMap.get(app.appid)!.add(cb),
+        });
+        if (onQuit) onQuitMap.get(app.appid)!.add(onQuit);
+
+        await Promise.allSettled([...onLaunchSet].map((cb) => cb()));
+      } else {
+        const onHeartbeatSet = onHeartbeatMap.get(app.appid)!;
+        await Promise.allSettled([...onHeartbeatSet].map((cb) => cb()));
       }
-
-      const instanceId = instanceIds.get(app.display_name)!;
-      onStill?.(app, instanceId)?.catch(console.error);
     }
 
-    for (const [name, instanceId] of instanceIds) {
-      if (!seenAppNames.has(name)) {
-        instanceIds.delete(name);
-        const app = Steam.AppStore.allApps //
-          .find((a) => a.display_name === name)!;
-        onStop?.(app, instanceId)?.catch(console.error);
+    for (const [appid, onQuitSet] of onQuitMap) {
+      if (!seenAppNames.has(appid)) {
+        onQuitMap.delete(appid);
+        onHeartbeatMap.delete(appid);
+        await Promise.allSettled([...onQuitSet].map((cb) => cb()));
       }
     }
-  }, MONITOR_RUNNING_APPS_POLL_INTERVAL);
+
+    inFlight = false;
+  }
+
+  checkRunningApps();
+  const monitor = setInterval(
+    checkRunningApps,
+    MONITOR_RUNNING_APPS_POLL_INTERVAL,
+  );
+  return () => clearInterval(monitor);
 }

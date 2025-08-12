@@ -10,6 +10,9 @@ namespace Steam {
   export interface PopupManager {
     GetExistingPopup(name: string): Popup | undefined;
     AddPopupCreatedCallback(callback: (popup: Popup) => void): void;
+    m_rgPopupCreatedCallbacks: {
+      m_vecCallbacks: Array<(popup: Popup) => void>;
+    };
   }
 
   export const PopupManager: PopupManager = Reflect.get(
@@ -17,7 +20,8 @@ namespace Steam {
     'g_PopupManager',
   );
 
-  export const MainWindowName = 'SP Desktop_uid0';
+  export const DesktopWindowName = 'SP Desktop_uid0';
+  export const GamepadWindowName = 'SP BPM_uid0';
 
   export interface Popup {
     get title(): string;

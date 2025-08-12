@@ -58,6 +58,8 @@ export function jsonReviver(_key: string, value: unknown) {
   return value;
 }
 
+// ===== Types ===== //
+
 export type Tuple<Holds, Length extends number> = Length extends Length
   ? number extends Length
     ? Holds[]
@@ -70,3 +72,8 @@ type _TupleOf<
 > = Rest['length'] extends Length
   ? Rest
   : _TupleOf<Holds, Length, [Holds, ...Rest]>;
+
+export type Awaitable<T> = T | Promise<T>;
+
+// biome-ignore lint/suspicious/noConfusingVoidType: on purpose
+export type Voidable<T> = T | void;

@@ -20,8 +20,6 @@
 
   // TypeScript
   "typescript.preferences.importModuleSpecifierEnding": "js",
-  "typescript.inlayHints.parameterNames.enabled": "literals",
-  "typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
 
   // Code Spell Checker
   "cSpell.language": "en-AU",
