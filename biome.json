@@ -24,6 +24,9 @@
         "noAssignInExpressions": "off",
         "noArrayIndexKey": "off",
         "noExplicitAny": "off"
+      },
+      "complexity": {
+        "noUselessLoneBlockStatements": "off"
       }
     }
   },
