@@ -22,7 +22,7 @@ A Millennium plugin that tracks playtime for non-Steam games.
 
 ### Manually Set Playtime
 
-If you want to manually set the playtime for a non-Steam app, you can do so by opening the app's properties page and clicking the "Playtime" button. This is useful if you want to manually set the playtime for a game that you've already played.
+To manually set the playtime for a non-Steam app, open its properties page and click the Playtime button. This is handy for recording time played in a game you’ve already spent hours on.
 
 ### Data Location
 
