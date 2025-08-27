@@ -39,9 +39,12 @@ export function onLocationChange(
       return;
     lastLocation = { ...currentLocation };
 
-    inFlight = true;
-    await handleChange(normaliseLocation(currentLocation));
-    inFlight = false;
+    try {
+      inFlight = true;
+      await handleChange(normaliseLocation(currentLocation));
+    } finally {
+      inFlight = false;
+    }
   }
 
   checkLocation();

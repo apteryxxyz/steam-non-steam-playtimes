@@ -39,7 +39,7 @@ export function PlaytimeInput({ app }: { app: Steam.AppOverview }) {
       setSaveState('Failed');
       logger.debug('Failed to set playtime', e);
     } finally {
-      setInterval(() => {
+      setTimeout(() => {
         setSaveState('Save');
         // Force location monitor to detect a "refresh" of the page to
         // instantly update the playtime
