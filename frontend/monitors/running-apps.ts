@@ -4,16 +4,16 @@ import Steam from '../steam.js';
 
 /**
  * Monitor running applications and trigger when they launch, quit or heartbeat
- * @param onLaunch Callback to trigger when an app launches
+ * @param handleLaunch Callback to trigger when an app launches
  * @returns A function to stop monitoring
  */
 export function onAppLaunch(
-  onLaunch: (
+  handleLaunch: (
     app: Steam.AppOverview,
     handlers: {
-      onLaunch: (onLaunch: VoidFunction) => void;
-      onHeartbeat: (onHeartbeat: VoidFunction) => void;
-      onQuit: (onQuit: VoidFunction) => void;
+      onLaunch: (handleLaunch: VoidFunction) => void;
+      onHeartbeat: (handleHeartbeat: VoidFunction) => void;
+      onQuit: (handleQuit: VoidFunction) => void;
     },
   ) => Awaitable<Voidable<VoidFunction>>,
 ) {
@@ -36,7 +36,7 @@ export function onAppLaunch(
         onHeartbeatMap.set(app.appid, new Set());
         const onLaunchSet = new Set<VoidFunction>();
 
-        const onQuit = await onLaunch(app, {
+        const onQuit = await handleLaunch(app, {
           onLaunch: (cb: VoidFunction) => onLaunchSet.add(cb),
           onHeartbeat: (cb: VoidFunction) =>
             onHeartbeatMap.get(app.appid)!.add(cb),

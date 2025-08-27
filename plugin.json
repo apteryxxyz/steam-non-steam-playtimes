@@ -1,6 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/shdwmtr/millennium/main/src/sys/plugin-schema.json",
-
   "name": "non-steam-playtimes",
   "common_name": "Non-Steam Playtimes",
   "description": "Track playtime for non-Steam games.",

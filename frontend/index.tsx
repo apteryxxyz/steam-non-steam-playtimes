@@ -1,18 +1,21 @@
-import './renderers/library-home.js';
-import './renderers/app-properties.js';
 import { NON_STEAM_APP_APPID_MASK } from './constants.js';
 import { forceFakeLocationChange } from './helpers.js';
 import logger from './logger.js';
 import { onLocationChange } from './monitors/location.js';
 import { onPopupCreate, PopupType } from './monitors/popups.js';
 import { onAppLaunch } from './monitors/running-apps.js';
-import OnLibraryAppLoaded from './renderers/library-app.js';
+import { register as registerAppProperties } from './renderers/app-properties.js';
+import { patch as patchLibraryApp} from './renderers/library-app.js';
+import { register as registerLibraryHome } from './renderers/library-home.js';
 import rpc from './rpc.js';
 import Steam from './steam.js';
 
 export { RPC } from './rpc.js';
 
 export default async function OnPluginLoaded() {
+  registerAppProperties();
+  registerLibraryHome();
+
   // ===== Monitor Running Apps ===== //
   // Monitor running applications to track non-steam app playtime sessions
 
@@ -22,7 +25,7 @@ export default async function OnPluginLoaded() {
 
     onLaunch(() => {
       logger.debug(
-        `Non-steam app ${app.display_name} launched, starting session...`,
+        `Launching non-steam app '${app.display_name}', tracking session '${instanceId}'`, //
         { app, instanceId },
       );
       rpc.OnNonSteamAppLaunch(app, instanceId);
@@ -30,7 +33,7 @@ export default async function OnPluginLoaded() {
 
     onHeartbeat(() => {
       logger.debug(
-        `Non-steam app ${app.display_name} still running, pinging session...`,
+        `Heartbeating non-steam app '${app.display_name}', pinging session '${instanceId}'`, //
         { app, instanceId },
       );
       rpc.OnNonSteamAppHeartbeat(app, instanceId);
@@ -39,16 +42,12 @@ export default async function OnPluginLoaded() {
 
     onQuit(() => {
       logger.debug(
-        `Non-steam app ${app.display_name} stopped, stopping session...`,
+        `Quitting non-steam app '${app.display_name}', ending session '${instanceId}'`, //
         { app, instanceId },
       );
       rpc.OnNonSteamAppQuit(app, instanceId);
     });
   });
-
-  logger.info(
-    'Started monitoring running apps for non-steam playtime tracking',
-  );
 
   // ===== Monitor Steam Popups ===== //
   // Monitor Steam popups to detect when library pages are loaded
@@ -58,8 +57,7 @@ export default async function OnPluginLoaded() {
 
     // ===== Monitor Main Window Location ===== //
 
-    logger.info('Started monitoring location changes in Steam window');
-    return onLocationChange(
+    const cleanup = onLocationChange(
       () => {
         if (type === PopupType.Desktop)
           return Steam.MainWindowBrowserManager?.m_lastLocation;
@@ -70,11 +68,11 @@ export default async function OnPluginLoaded() {
           const appId = Number(pathname.split('/')[3]);
           const app = Steam.AppStore.allApps //
             .find((app) => app.appid === appId)!;
-          OnLibraryAppLoaded(popup.window!, app);
+          patchLibraryApp(popup.window!, app);
         }
       },
     );
-  });
 
-  logger.info('Started monitoring Steam popups for library page detection');
+    return cleanup;
+  });
 }

@@ -5,14 +5,17 @@ import {
 } from '../components/play-bar.js';
 import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 import { querySelectorAll, renderComponent } from '../helpers.js';
+import logger from '../logger.js';
 import rpc from '../rpc.js';
 import type Steam from '../steam.js';
 
-export default async function OnLibraryAppLoaded(
-  window: Window,
-  app: Steam.AppOverview,
-) {
+export async function patch(window: Window, app: Steam.AppOverview) {
   if (app.appid < NON_STEAM_APP_APPID_MASK) return;
+
+  logger.debug(
+    `Patching library app for non-Steam app '${app.display_name}'`, //
+    { window, app },
+  );
 
   // I tried using app.minutes_playtime_forever and such but the stats didn't appear after the first render (???)
   const [{ minutesForever, lastPlayedAt }] = //

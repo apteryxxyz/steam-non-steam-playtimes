@@ -15,7 +15,7 @@ const ms = createMs({
 
 const SettingsStyles = findClassModule((m) => m.SectionTopLine)!;
 
-export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
+export function PlaytimeInput({ app }: { app: Steam.AppOverview }) {
   const [playtimeMs, setPlaytimeMs] = //
     useState(app.minutes_playtime_forever * Time.Minute);
   const [initialPlaytime] = useState(() => ms(playtimeMs) ?? '');
@@ -49,7 +49,6 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
   }, [app, playtimeMs]);
 
   return (
-    <div className="DialogBody">
       <div>
         <div className={SettingsStyles.Title}>Playtime</div>
         <div>
@@ -76,6 +75,5 @@ export function PlaytimePropertiesPage({ app }: { app: Steam.AppOverview }) {
           </Button>
         </div>
       </div>
-    </div>
   );
 }

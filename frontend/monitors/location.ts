@@ -1,13 +1,9 @@
 import { MONITOR_LOCATION_POLL_INTERVAL } from '../constants.js';
 import type { Awaitable, Voidable } from '../helpers.js';
 
-// In previous versions of this, it just added a listener on history, but
-// for whatever reason, when exiting Big Picture mode, the listener would
-// be removed
-
 type Location = { pathname: string; search: string; hash: string };
 
-function normaliseLocation(location: Location) {
+function normaliseLocation(location: Location): Location {
   return {
     pathname: location.pathname
       // Big picture mode pathname is prepended with "/routes"
@@ -20,12 +16,12 @@ function normaliseLocation(location: Location) {
 /**
  * Monitor a location for changes and trigger an action when it happens
  * @param getLocation Getter function to get the current location, different depending on the context
- * @param onChange Callback to trigger when the location changes
+ * @param handleChange Callback to trigger when the location changes
  * @returns A function to stop monitoring
  */
 export function onLocationChange(
-  getLocation: NoInfer<() => Voidable<Location>>,
-  onChange: (location: Location) => Awaitable<void>,
+  getLocation: () => Voidable<Location>,
+  handleChange: (location: Location) => Awaitable<void>,
 ) {
   let inFlight = false;
   let lastLocation: Location | undefined;
@@ -44,7 +40,7 @@ export function onLocationChange(
     lastLocation = { ...currentLocation };
 
     inFlight = true;
-    await onChange?.(normaliseLocation(currentLocation));
+    await handleChange(normaliseLocation(currentLocation));
     inFlight = false;
   }
 
