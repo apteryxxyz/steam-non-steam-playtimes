@@ -1,6 +1,8 @@
 import type { Awaitable, Voidable } from '../helpers.js';
 import Steam from '../steam.js';
 
+const kOnCloseSet = Symbol.for('non-steam-playtimes.on-close-set');
+
 export enum PopupType {
   Desktop = 'desktop',
   Gamepad = 'gamepad',
@@ -24,11 +26,7 @@ export function onPopupCreate(
     },
   ) => Awaitable<Voidable<VoidFunction>>,
 ) {
-  const cleanupSet = new Set<VoidFunction>();
-
   async function handlePopupCreate(popup: Steam.Popup) {
-    const onCloseSet = new Set<VoidFunction>();
-
     let type: PopupType = PopupType.Unknown;
     if (popup.window?.name.startsWith('SP Desktop_')) type = PopupType.Desktop;
     else if (popup.window?.name.startsWith('SP BPM_')) type = PopupType.Gamepad;
@@ -37,17 +35,19 @@ export function onPopupCreate(
     else if (popup.window?.name.startsWith('contextmenu_'))
       type = PopupType.ContextMenu;
 
+    const onCloseSet = new Set<VoidFunction>();
+    Reflect.set(popup, kOnCloseSet, onCloseSet);
+
     const onClose = await onOpen(popup, type, {
       onOpen: (cb: VoidFunction) => cb(),
       onClose: (cb: VoidFunction) => onCloseSet.add(cb),
     });
     if (onClose) onCloseSet.add(onClose);
+  }
 
-    const beforeUnload = () => onCloseSet.forEach((cb) => cb());
-    popup.window?.addEventListener('beforeunload', beforeUnload);
-    cleanupSet.add(() =>
-      popup.window?.removeEventListener('beforeunload', beforeUnload),
-    );
+  async function handlePopupDestroy(popup: Steam.Popup) {
+    const onCloseSet = Reflect.get(popup, kOnCloseSet) as Set<VoidFunction>;
+    if (onCloseSet) onCloseSet.forEach((cb) => cb());
   }
 
   const mainWindow = //
@@ -56,12 +56,14 @@ export function onPopupCreate(
   const gamepadWindow = //
     Steam.PopupManager.GetExistingPopup(Steam.GamepadWindowName);
   if (gamepadWindow) handlePopupCreate(gamepadWindow);
-  Steam.PopupManager.AddPopupCreatedCallback(handlePopupCreate);
+
+  const { Unregister: removeCreateCallback } =
+    Steam.PopupManager.AddPopupCreatedCallback(handlePopupCreate);
+  const { Unregister: removeDestroyCallback } =
+    Steam.PopupManager.AddPopupDestroyedCallback(handlePopupDestroy);
 
   return () => {
-    const callbacks =
-      Steam.PopupManager.m_rgPopupCreatedCallbacks.m_vecCallbacks;
-    callbacks.splice(callbacks.indexOf(handlePopupCreate), 1);
-    cleanupSet.forEach((cb) => cb());
+    removeCreateCallback();
+    removeDestroyCallback();
   };
 }
