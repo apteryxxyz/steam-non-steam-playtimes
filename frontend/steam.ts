@@ -5,14 +5,30 @@ type SB_AppOverview = NonNullable<
 >;
 
 namespace Steam {
+  // ===== CallbackList ===== //
+
+  export interface CallbackList<Arguments extends unknown[]> {
+    m_vecCallbacks: Array<(...args: Arguments) => void>;
+    Register(callback: (...args: Arguments) => void): {
+      Unregister: () => void;
+    };
+    Dispatch(...args: Arguments): void;
+    ClearAllCallbacks(): void;
+    CountRegistered(): number;
+  }
+
   // ===== PopupManager ===== //
 
   export interface PopupManager {
     GetExistingPopup(name: string): Popup | undefined;
-    AddPopupCreatedCallback(callback: (popup: Popup) => void): void;
-    m_rgPopupCreatedCallbacks: {
-      m_vecCallbacks: Array<(popup: Popup) => void>;
-    };
+    m_rgPopupCreatedCallbacks: CallbackList<[Popup]>;
+    AddPopupCreatedCallback(
+      callback: (popup: Popup) => void,
+    ): ReturnType<this['m_rgPopupCreatedCallbacks']['Register']>;
+    m_rgPopupDestroyedCallbacks: CallbackList<[Popup]>;
+    AddPopupDestroyedCallback(
+      callback: (popup: Popup) => void,
+    ): ReturnType<this['m_rgPopupDestroyedCallbacks']['Register']>;
   }
 
   export const PopupManager: PopupManager = Reflect.get(
