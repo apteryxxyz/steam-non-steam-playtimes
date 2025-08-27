@@ -1,5 +1,5 @@
 import { beforePatch } from '@steambrew/client';
-import { PlaytimePropertiesPage } from '../components/playtime-properties-page.js';
+import { PlaytimeInput } from '../components/playtime-input.js';
 import { NON_STEAM_APP_APPID_MASK } from '../constants.js';
 import { waitFor } from '../helpers.js';
 import logger from '../logger.js';
@@ -26,7 +26,7 @@ function isAppPropertiesPage(page: unknown): page is AppPropertiesPage {
 // can be added to the app properties page, and I don't want to bother
 // with mutating the DOM.
 
-(async () => {
+export async function register() {
   // On Steam startup, Array#map is called ~15,000 times. By
   // waiting for the MainWindowBrowserManager to be ready before patching,
   // we reduce the number of calls to this patch to ~700.
@@ -44,10 +44,6 @@ function isAppPropertiesPage(page: unknown): page is AppPropertiesPage {
       )
         return;
 
-      logger.debug(
-        'Intercepted Array<AppPropertiesPage>.map, appending playtime page...',
-      );
-
       const appId = Number(this[0]!.link.split('/')[2]);
       if (Number.isNaN(appId) || appId < NON_STEAM_APP_APPID_MASK) return;
       const app = Steam.AppStore.allApps.find((a) => a.appid === appId)!;
@@ -56,11 +52,16 @@ function isAppPropertiesPage(page: unknown): page is AppPropertiesPage {
         title: 'Playtime',
         route: '/app/:appid/properties/playtime',
         link: `/app/${app.appid}/properties/playtime`,
-        content: <PlaytimePropertiesPage app={app} />,
+        content: (
+          <div className="DialogBody">
+            <PlaytimeInput app={app} />
+          </div>
+        ),
       });
     },
   );
-  logger.info('Applied Array#map patch', patch);
-})();
 
-export default function OnAppPropertiesLoaded() {}
+  logger.debug('Registered app properties patch', { patch });
+
+  return patch.unpatch;
+}

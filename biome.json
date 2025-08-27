@@ -1,36 +1,30 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!**/node_modules/**/*", "!**/.millennium/**/*"]
+    "includes": [
+      "**",
+      "!**/.ignore/**/*",
+      "!**/node_modules/**/*",
+      "!**/.millennium/**/*"
+    ]
   },
 
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineEnding": "lf"
+    "lineEnding": "lf",
+    "expand": "auto"
   },
-
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "style": {
-        "noNonNullAssertion": "off",
-        "noUselessElse": "off",
-        "noParameterAssign": "off"
-      },
-      "suspicious": {
-        "noAssignInExpressions": "off",
-        "noArrayIndexKey": "off",
-        "noExplicitAny": "off"
-      },
-      "complexity": {
-        "noUselessLoneBlockStatements": "off"
+        "noNonNullAssertion": "off"
       }
     }
   },
-
   "assist": {
     "actions": {
       "source": {
@@ -44,14 +38,6 @@
       "quoteStyle": "single",
       "jsxQuoteStyle": "double",
       "semicolons": "always"
-    }
-  },
-  "css": {
-    "formatter": {
-      "enabled": false
-    },
-    "linter": {
-      "enabled": false
     }
   }
 }

@@ -4,30 +4,33 @@ import logger from '../logger.js';
 import rpc from '../rpc.js';
 import Steam from '../steam.js';
 
-const patch = beforePatch(
-  Steam.CollectionStore,
-  'OnAppOverviewChange',
-  // @ts-ignore
-  async function (this: Steam.CollectionStore, [apps]: [Steam.AppOverview[]]) {
-    logger.debug(
-      'Intercepted Steam.CollectionStore.OnAppOverviewChange, overriding playtimes...',
-    );
+export function register() {
+  const patch = beforePatch(
+    Steam.CollectionStore,
+    'OnAppOverviewChange',
+    // @ts-ignore
+    async function (
+      this: Steam.CollectionStore,
+      [apps]: [Steam.AppOverview[]],
+    ) {
+      const nonSteamApps = apps //
+        .filter((a) => a.appid > NON_STEAM_APP_APPID_MASK);
+      const appNames = nonSteamApps.map((a) => a.display_name);
+      const playTimings = await rpc.GetPlaytimes(appNames);
 
-    const nonSteamApps = apps.filter((a) => a.appid > NON_STEAM_APP_APPID_MASK);
-    const playTimings = await rpc.GetPlaytimes(
-      nonSteamApps.map((a) => a.display_name),
-    );
+      for (let i = 0; i < nonSteamApps.length; i++) {
+        const app = nonSteamApps[i]!;
+        const playtime = playTimings[i]!;
 
-    for (let i = 0; i < nonSteamApps.length; i++) {
-      const app = nonSteamApps[i]!;
-      const playtime = playTimings[i]!;
+        app.minutes_playtime_forever = playtime.minutesForever;
+        app.minutes_playtime_last_two_weeks = playtime.minutesLastTwoWeeks;
+        app.rt_last_time_played =
+          (playtime.lastPlayedAt?.getTime() ?? 0) / 1000;
+      }
+    },
+  );
 
-      app.minutes_playtime_forever = playtime.minutesForever;
-      app.minutes_playtime_last_two_weeks = playtime.minutesLastTwoWeeks;
-      app.rt_last_time_played = (playtime.lastPlayedAt?.getTime() ?? 0) / 1000;
-    }
-  },
-);
-logger.info('Applied Steam.CollectionStore.OnAppOverviewChange patch', patch);
+  logger.debug('Registered library home patch', { patch });
 
-export default async function OnLibraryHomeLoaded() {}
+  return patch.unpatch;
+}

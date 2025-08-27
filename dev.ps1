@@ -1,81 +1,84 @@
-$STEAM = "C:\Program Files (x86)\Steam"
+function Stop-SteamProcess {
+  Write-Host "Stopping Steam process..."
+  Get-Process -Name "steam" -ErrorAction SilentlyContinue | Stop-Process -Force
+}
 
-function Stop-Steam {
-  Write-Output "Checking for existing Steam process..."
-  $steamProcess = Get-Process -Name "steam" -ErrorAction SilentlyContinue
+function Start-SteamProcess {
+  param ([string]$SteamPath)
 
-  if ($steamProcess) {
-    Write-Output "Steam is running, stopping process..."
-    Stop-Process -Name "steam" -Force
-  }
-  else {
-    Write-Output "Steam is not running, skipping..."
-  }
+  Write-Host "Starting Steam process in dev mode..."
+  Start-Process -FilePath "$SteamPath/steam.exe" -ArgumentList "-dev"
+}
+
+function Get-PluginName {
+  param ([string]$Path)
+
+  $json = Get-Content $Path | ConvertFrom-Json
+  return @($json.name, $json.common_name)
+}
+
+function Set-PluginName {
+  param ([string]$Path, [string]$Name, [string]$CommonName)
+
+  $json = Get-Content $Path | ConvertFrom-Json
+  $json.name = $Name
+  $json.common_name = $CommonName
+  $json | ConvertTo-Json -Depth 100 | Set-Content $Path
+
+  pnpm biome format plugin.json --write
 }
 
 function Build-Plugin {
-  Write-Output "Building plugin..."
+  Write-Host "Building plugin..."
   pnpm millennium-ttc --build dev
 }
 
-function Create-Plugin-Symlink {
-  $pluginName = (Get-Content "./plugin.json" | ConvertFrom-Json).name
-  $targetPath = "$STEAM\plugins\$pluginName"
-  $sourcePath = Get-Location
+function Copy-PluginFiles {
+  param ([string]$Destination)
 
-  if (Test-Path $targetPath) {
-    Write-Output "Plugin symlink already exists, skipping..."
-    return
-  }
-
-  Write-Output "Creating symlink to plugins directory..."
-
-  $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
-  ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-  if ($isAdmin) {
-    New-Item -Path $targetPath -ItemType SymbolicLink -Value $sourcePath | Out-Null
-  }
-  else {
-    $targetPath = $targetPath.Replace('`', '``').Replace('"', '""')
-    $sourcePath = $sourcePath.ToString().Replace('`', "``").Replace('"', '""')
-    $commandToRun = "New-Item -Path '$targetPath' -ItemType SymbolicLink -Value '$sourcePath' | Out-Null"
-    Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-Command", $commandToRun -Verb RunAs
-  }
+  Write-Host "Copying plugin files to $Destination..."
+  New-Item -Path $Destination -ItemType Directory -Force | Out-Null
+  Copy-Item -Path "plugin.json" -Destination $Destination -Force
+  Copy-Item -Path ".millennium" -Destination $Destination -Recurse -Force
+  Copy-Item -Path "backend" -Destination $Destination -Recurse -Force
 }
 
-function Enable-Plugin {
-  $pluginName = (Get-Content "./plugin.json" | ConvertFrom-Json).name
-  $millenniumPath = "$STEAM\ext\millennium.ini"
-  $iniContent = Get-Content $millenniumPath
-  
-  if ($iniContent | Select-String -Pattern $pluginName) {
-    Write-Output "Plugin already enabled, skipping..."
+function Toggle-Plugin {
+  param ([string]$Path, [string]$Name, [bool]$Enable)
+
+  Write-Host "$(if ($Enable) { "Enabling" } else { "Disabling" }) plugin $Name..."
+
+  $lines = Get-Content $Path
+
+  for ($i = 0; $i -lt $lines.Length; $i++) {
+    if ($lines[$i] -match '^\s*enabled_plugins\s*=') {
+      $plugins = ($lines[$i] -split '=')[1].Trim() -split '\|'
+
+      if ($Enable) {
+        if (-not ($plugins -contains $Name)) { $plugins += $Name }
+        $plugins = $plugins | Sort-Object
+      } else {
+        $plugins = $plugins | Where-Object { $_ -ne $Name }
+      }
+
+      $lines[$i] = "enabled_plugins = " + ($plugins -join '|')
+      break
+    }
   }
-  else {
-    Write-Output "Enabling plugin..."
-    $iniContent = $iniContent -replace "core", "core|$pluginName"
-    $iniContent | Set-Content $millenniumPath
-  }
+
+  Set-Content $Path $lines
 }
 
-function Start-SteamDevMode {
-  Write-Output "Starting Steam in dev mode..."
-  Start-Process -FilePath "$STEAM\steam.exe" -ArgumentList "-dev"
-  Start-Sleep -Seconds 10
-}
+#####
 
-function Open-DevTools {
-  Add-Type -AssemblyName System.Windows.Forms
-  Write-Output "Pressing F12 to open DevTools..."
-  [System.Windows.Forms.SendKeys]::SendWait("{F12}")
-}
-
-# ===== Main Execution ===== #
-
-Stop-Steam
+$SteamPath = "C:\Program Files (x86)\Steam"
+$IniPath = "$SteamPath\ext\millennium.ini"
+$PluginName, $PluginCommonName = Get-PluginName -Path "./plugin.json"
+Stop-SteamProcess
+Set-PluginName -Path "plugin.json" -Name $PluginName-dev -CommonName "$PluginCommonName (dev)"
 Build-Plugin
-Create-Plugin-Symlink
-Enable-Plugin
-Start-SteamDevMode
-Open-DevTools
+Copy-PluginFiles -Destination "$SteamPath\plugins\$PluginName-dev"
+Set-PluginName -Path "plugin.json" -Name $PluginName -CommonName $PluginCommonName
+Toggle-Plugin -Path $IniPath -Name $PluginName -Enable $false
+Toggle-Plugin -Path $IniPath -Name $PluginName-dev -Enable $true
+Start-SteamProcess $SteamPath

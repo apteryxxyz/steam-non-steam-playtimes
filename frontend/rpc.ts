@@ -41,13 +41,19 @@ export class RPC {
   async GetPlaytimes<T extends readonly string[]>(appNames: T) {
     if (appNames.length === 0)
       return [] as Tuple<(typeof formatted)[number], T['length']>;
-    const timings = await call<any[]>('RPC.GetPlaytimes', {
+    const timings = await call<
+      {
+        minutes_forever: number;
+        minutes_last_two_weeks: number;
+        last_played_at: Date;
+      }[]
+    >('RPC.GetPlaytimes', {
       app_names: appNames,
     });
     const formatted = timings.map((t) => ({
       minutesForever: Math.round(t.minutes_forever),
       minutesLastTwoWeeks: Math.round(t.minutes_last_two_weeks),
-      lastPlayedAt: t.last_played_at as Date | null,
+      lastPlayedAt: t.last_played_at,
     }));
     return formatted as Tuple<(typeof formatted)[number], T['length']>;
   }

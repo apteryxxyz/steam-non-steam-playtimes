@@ -13,16 +13,16 @@ export enum PopupType {
 
 /**
  * Monitor Steam popups and trigger when an action is made on them
- * @param onOpen Callback to trigger when a popup is opened
+ * @param handleOpen Callback to trigger when a popup is opened
  * @returns A function to stop monitoring
  */
 export function onPopupCreate(
-  onOpen: (
+  handleOpen: (
     popup: Steam.Popup,
     type: PopupType,
     handlers: {
-      onOpen: (onOpen: VoidFunction) => void;
-      onClose: (onClose: VoidFunction) => void;
+      onOpen: (handleOpen: VoidFunction) => void;
+      onClose: (handleClose: VoidFunction) => void;
     },
   ) => Awaitable<Voidable<VoidFunction>>,
 ) {
@@ -38,7 +38,7 @@ export function onPopupCreate(
     const onCloseSet = new Set<VoidFunction>();
     Reflect.set(popup, kOnCloseSet, onCloseSet);
 
-    const onClose = await onOpen(popup, type, {
+    const onClose = await handleOpen(popup, type, {
       onOpen: (cb: VoidFunction) => cb(),
       onClose: (cb: VoidFunction) => onCloseSet.add(cb),
     });
