@@ -33,11 +33,14 @@ export async function waitFor<T>(
 /**
  * Force a fake location change
  */
-export function forceFakeLocationChange() {
+export function forceFakeLocationChange(
+  window: Window = Steam.MainPopup?.window ?? globalThis.window,
+) {
   if (Steam.UIStore.MainInstanceUIMode === Steam.UIMode.Desktop)
     Steam.MainWindowBrowserManager.m_lastLocation.hash = `#${Math.random()}`;
   else if (Steam.UIStore.MainInstanceUIMode === Steam.UIMode.Gamepad)
-    window.opener!.location.hash = `#${Math.random()}`;
+    if (window.opener instanceof Window)
+      window.opener.location.hash = `#${Math.random()}`;
 }
 
 /**

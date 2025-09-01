@@ -47,7 +47,8 @@ export function onPopupCreate(
 
   async function handlePopupDestroy(popup: Steam.Popup) {
     const onCloseSet = Reflect.get(popup, kOnCloseSet) as Set<VoidFunction>;
-    if (onCloseSet) onCloseSet.forEach((cb) => cb());
+    if (onCloseSet) for (const cb of onCloseSet) cb();
+    Reflect.deleteProperty(popup, kOnCloseSet);
   }
 
   const mainWindow = //

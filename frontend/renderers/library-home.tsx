@@ -8,7 +8,7 @@ export function register() {
   const patch = beforePatch(
     Steam.CollectionStore,
     'OnAppOverviewChange',
-    // @ts-ignore
+    // @ts-expect-error - beforePatch doesn't have good typings
     async function (
       this: Steam.CollectionStore,
       [apps]: [Steam.AppOverview[]],

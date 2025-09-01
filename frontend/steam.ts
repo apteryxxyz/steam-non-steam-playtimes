@@ -46,6 +46,17 @@ namespace Steam {
     get root_element(): Element;
   }
 
+  export const MainPopup: Popup | undefined = undefined;
+  Object.defineProperty(Steam, 'MainPopup', {
+    get(): Popup | undefined {
+      if (Steam.UIStore.MainInstanceUIMode === UIMode.Desktop)
+        return PopupManager.GetExistingPopup(DesktopWindowName);
+      if (Steam.UIStore.MainInstanceUIMode === UIMode.Gamepad)
+        return PopupManager.GetExistingPopup(GamepadWindowName);
+      return undefined;
+    },
+  });
+
   // ===== MainWindowBrowser ===== //
 
   export interface MainWindowBrowserManager {
