@@ -5,7 +5,7 @@ import { onLocationChange } from './monitors/location.js';
 import { onPopupCreate, PopupType } from './monitors/popups.js';
 import { onAppLaunch } from './monitors/running-apps.js';
 import { register as registerAppProperties } from './renderers/app-properties.js';
-import { patch as patchLibraryApp} from './renderers/library-app.js';
+import { patch as patchLibraryApp } from './renderers/library-app.js';
 import { register as registerLibraryHome } from './renderers/library-home.js';
 import rpc from './rpc.js';
 import Steam from './steam.js';
