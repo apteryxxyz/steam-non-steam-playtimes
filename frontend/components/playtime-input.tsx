@@ -57,6 +57,8 @@ export function PlaytimeInput({ app }: { app: Steam.AppOverview }) {
       </div>
       <div className={SettingsStyles.AsyncBackedInputChildren}>
         <TextField
+          // @ts-expect-error - placeholder is a valid prop but not typed
+          placeholder="e.g. 2h 30m"
           defaultValue={initialPlaytime}
           onChange={(e) => {
             if (e.target.value === '') setPlaytimeMs(0);
