@@ -39,16 +39,27 @@ def collapse_sessions():
   UNIX_EPOCH = datetime.fromtimestamp(0, timezone.utc)
 
   for sessions in _sessions.values():
-    zero_session = next((s for s in sessions if s["started_at"] == UNIX_EPOCH), None)
+    zero_session = None
+    latest_session = None
+    stale_sessions = []
+
+    for session in sessions:
+      if session["started_at"] == UNIX_EPOCH:
+        zero_session = session
+      if not latest_session or session["ended_at"] > latest_session["ended_at"]:
+        latest_session = session
+      if session["ended_at"] < TWO_WEEKS_AGO:
+        stale_sessions.append(session)
+
     if zero_session is None:
       zero_session = {"started_at": UNIX_EPOCH, "ended_at": UNIX_EPOCH}
-      sessions.append(zero_session)
+      sessions.insert(0, zero_session)
 
-    old_sessions = [s for s in sessions if s is not zero_session and s["ended_at"] < TWO_WEEKS_AGO]
-    for session in old_sessions:
-      session_time = session["ended_at"] - session["started_at"]
-      zero_session["ended_at"] += session_time
-      sessions.remove(session)
+    for session in stale_sessions:
+      if session is not latest_session and session is not zero_session:
+        session_time = session["ended_at"] - session["started_at"]
+        zero_session["ended_at"] += session_time
+        sessions.remove(session)
 
 def save_sessions():
   # Save to a temp file to avoid corrupting the original
