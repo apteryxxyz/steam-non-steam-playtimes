@@ -2,9 +2,9 @@ import { findClassModule, findModuleExport } from '@steambrew/client';
 import Steam from '../steam.js';
 
 const formatRelativeDate = //
-  findModuleExport((e) => e?.toString()?.includes('"#Time_Today"'));
+  findModuleExport((e) => e?.toString?.()?.includes('"#Time_Today"'));
 const formatDuration = //
-  findModuleExport((e) => e?.toString()?.includes('"#Played_"'));
+  findModuleExport((e) => e?.toString?.()?.includes('"#Played_"'));
 
 const PlayBar = findClassModule((m) => m.GameStat) as Record<string, string>;
 export const PlayBarClasses = PlayBar;

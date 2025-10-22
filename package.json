@@ -10,16 +10,16 @@
     "dev": "powershell -ExecutionPolicy Bypass -File dev.ps1"
   },
   "dependencies": {
-    "@steambrew/client": "^5.5.2",
+    "@steambrew/client": "^5.8.0",
     "enhanced-ms": "^4.1.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.2",
-    "@steambrew/ttc": "^2.7.3",
-    "@types/react": "18.3.24",
-    "@types/react-dom": "18.3.7",
-    "typescript": "^5.9.2"
+    "@biomejs/biome": "^2.2.7",
+    "@steambrew/ttc": "^2.8.6",
+    "@types/react": "19.1.1",
+    "@types/react-dom": "19.1.1",
+    "typescript": "^5.9.3"
   }
 }
